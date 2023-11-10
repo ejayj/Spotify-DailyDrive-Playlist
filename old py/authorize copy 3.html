@@ -1,0 +1,10 @@
+{% extends "header.html" %}
+{% block title %} Authorize Spotify Web API Demo{% endblock%}
+
+{% block content%}   
+    <div class="container">
+        <input type="button" onclick="RA()" value="Request Authorization"><br/>
+    </div>
+{{ token }}
+
+{%  endblock %}

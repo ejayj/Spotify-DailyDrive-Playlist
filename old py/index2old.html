@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> title </title>
+    <script src="plain.js"></script>
+
+    <script src="{{url_for('static', filename='animals.js')}}"></script>
+</head>
+    <body>
+        <p>This is Index.html</p>
+        <input id="searchbar" onkeyup="search_animal()" type="text"
+        name="search" placeholder="Search animals..">
+    
+        <ol id="list"> 
+            <!-- loop a list of playlist options -->
+            {%for i in range(0, 100)%} 
+                <form action="#" method="POST">
+                    <li class="animals" id="ply"> 
+                        <input type="submit" value='{{ data["playlists"][i]["name"]}}' name="playlistname"> 
+                        <input type="hidden" name="playlist" value='{{data["playlists"][i]}}'>
+                    </li>
+                </form>
+             {%endfor%}
+            <!-- end loop -->
+        </ol>
+        <!-- <p>{{ data }} </p> -->
+        <!-- {{data["playlists"][0]["name"]}} --> <!-- displays individul plylists-->
+
+    </body>
+</html>

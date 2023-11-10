@@ -1,0 +1,57 @@
+In flask, I can do this:
+
+render_template("foo.html", messages={'main':'hello'})
+And if foo.html contains {{ messages['main'] }}, the page will show hello.
+
+
+do i want to use session?
+
+error i got that i need to fix:
+Shuffling URIs
+192.168.1.11 - - [17/Oct/2023 16:45:24] "GET /playlist HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "/opt/homebrew/lib/python3.11/site-packages/flask/app.py", line 1478, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.11/site-packages/flask/app.py", line 1458, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.11/site-packages/flask/app.py", line 1455, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.11/site-packages/flask/app.py", line 869, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.11/site-packages/flask/app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.11/site-packages/flask/app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/emmanueljohnson/Documents/Documents - Emmanuel’s MacBook Air /Developer/flask/app.py", line 49, in playlist
+    url=main.run_playlist_script(playlist["id"])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/emmanueljohnson/Documents/Documents - Emmanuel’s MacBook Air /Developer/flask/main.py", line 13, in run_playlist_script
+    print(playlist.build_daily_drive_playlist(2,playlistid))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/emmanueljohnson/Documents/Documents - Emmanuel’s MacBook Air /Developer/flask/playlist.py", line 460, in build_daily_drive_playlist
+    uris=search.shuffle_compile_playlists_tracks(playlist_selection_id)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/emmanueljohnson/Documents/Documents - Emmanuel’s MacBook Air /Developer/flask/search.py", line 143, in shuffle_compile_playlists_tracks
+    uris=shuffle_compile_uris_2(get_playlist_tracks_shuffle(token,playlist_selection_id))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/emmanueljohnson/Documents/Documents - Emmanuel’s MacBook Air /Developer/flask/search.py", line 131, in shuffle_compile_uris_2
+    random_track_indices = random.sample(range(maxrange),28)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.11/3.11.5/Frameworks/Python.framework/Versions/3.11/lib/python3.11/random.py", line 456, in sample
+    raise ValueError("Sample larger than population or is negative")
+
+
+put what i can into a database, including the refresh token
+
+
+\
+
+
+
+add footer

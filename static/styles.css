@@ -1,0 +1,30 @@
+#bootstrap-overrides { /* 100+1=101 priority score, yay! */
+    line-height: 1;
+    color: inherit;
+  }
+
+div#loading {
+    top: 200 px;
+    margin: auto;
+    position: absolute;
+    z-index: 1000;
+    width: 160px;
+    height: 24px;
+    background: url(loadingimage.gif) no-repeat;
+    cursor: wait;
+}
+
+/* not using these
+.ply { /* class selector 
+    background-color: none;
+} 
+
+#animals { /* id selector 
+    background-color: none;
+} 
+
+h1 { /* type selector
+    background-color: blue;
+}
+*/
+

@@ -1,0 +1,29 @@
+{
+    "podcasts": [
+        {
+            "name": "Radio Headspace",
+            "id": "5ulnZFwoLkEv566YCZwTvY",
+            "uri": "spotify:episode:71UphoPeTi9xq4thBGg0Pu"
+        },
+        {
+            "name": "ABC News Update",
+            "id": "28hRDWxeu4r8LF3vubetm3",
+            "uri": "spotify:episode:7IlI9zO6D0IaAvCvfclh7k"
+        },
+        {
+            "name": "NPR News Now",
+            "id": "6BRSvIBNQnB68GuoXJRCnQ",
+            "uri": "spotify:episode:5IhG1Myv0TroVzCddiPIqJ"
+        },
+        {
+            "name": "CNN 5 Things",
+            "id": "1xGSLDgVYxLybmXpui6wwo",
+            "uri": "spotify:episode:6Bx15nXu4jYnmlBTThZWBz"
+        },
+        {
+            "name": "FOX News Hourly Update",
+            "id": "6IXn2rWLGMcVVEOELvA8Hw",
+            "uri": "spotify:episode:2v4SHPihvWkvla9f37Icmt"
+        }
+    ]
+}

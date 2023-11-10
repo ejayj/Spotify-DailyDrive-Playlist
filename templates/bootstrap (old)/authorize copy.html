@@ -1,0 +1,53 @@
+{% extends "header.html" %}
+{% block title %} Home {% endblock%}
+
+{% block content%}   
+
+<!-- Redirect (clean up url after token!)-->
+<script>
+    var redirect = "{{ redirect }}"
+    window.onload = function() {
+        // similar behavior as clicking on a link
+        if (redirect = true) {
+         //window.location.href = "{{url_for('index2')}}"; //this creates an infinite loop
+        }
+    }
+</script>
+<!-- MODAL -->
+<!-- How do i make this non-exitable? you have to login-->
+<!-- maybe for activation, do activation.html where the modal is activate, and-->
+<!-- if ur not logged in, show modal. -->
+<div id="modal-js-example" class="modal {{ visibility }}">
+    <div class="modal-background"></div>
+  
+    <div class="modal-content">
+      <div class="box">
+        <p>Modal JS example</p>
+        <!-- Your content -->
+        <button onclick="RA()" value="Request Authorization">Login With Spotify</button>
+      </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+</div>
+<!-- END MODAL -->
+    <p>This is Index.html</p>
+    
+    <input id="searchbar" onkeyup="search_animal()" type="text"
+    name="search" placeholder="Search playlists..">
+    
+    <ol id="list"> 
+        <!-- loop a list of playlist options -->
+        {%for i in range(0, 100)%} 
+            <form action="{{url_for('createplaylist')}}" method="POST">
+                <li class="animals" font-weight: "none" id="ply"> 
+                    <input href="href="#0"" type="submit" value='{{ data["playlists"][i]["name"]}}' name="playlistname"> 
+                    <input type="hidden" name="playlist" value='{{data["playlists"][i]["index"]}}'>
+                </li>
+            </form>
+         {%endfor%}
+        <!-- end loop -->
+    </ol>
+    <!-- <p>{{ data }} </p> -->
+    <!-- {{data["playlists"][0]["name"]}} --> <!-- displays individul plylists-->
+    </div>
+    {% endblock %}
