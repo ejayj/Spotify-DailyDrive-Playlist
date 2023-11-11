@@ -702,7 +702,7 @@ def get_all_user_owned_playlists(): #how to get all only my playlists
             if(json_result['items'][index]['owner']['display_name']==authtoken.get_current_user_db_info().username): #if the playlists are mine... add them to the json (or in this case, the list of available playlists to choose from)  NOTE: for spotify featured playlists and not my own, I can simply do playlists that aren't mine w/ !, or get rid of if altogether for all resuls (there's 1290 though)
                 id = json_result['items'][index]['id']
                 result=add_playlist_to_list(id)
-                print(authtoken.get_current_user_db_info().username)
+                #print(authtoken.get_current_user_db_info().username)
                 playlist_count=playlist_count+1
                 if result == False:
                     print('error getting user owned playlists')
@@ -901,10 +901,10 @@ def set_token(t):
         return None
     return token
 
-def setglobalvariables():
-    set_userid()
-    set_token(session.get('accesstoken'))
-    return None
+#def setglobalvariables():
+#    set_userid()
+#    set_token(session.get('accesstoken'))
+#    return None
 # NEXT TO DO:
 
 #make it a web app first - how to make python a compiled app /w gui?

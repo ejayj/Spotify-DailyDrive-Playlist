@@ -2,6 +2,7 @@ from urllib.parse import urlencode
 import authtoken #these, and below, are my modules *********
 import search
 import playlist
+from db import mongo
 
 #main playlist thing
 
@@ -15,14 +16,17 @@ def run_playlist_script(playlistid):
     #print(url)
     return url
 
-def get_user_playlists():
-    playlist.setglobalvariables()
+def get_user_playlists(uid):
+    #playlist.setglobalvariables() #we dont need this anymore because we fixed sessions
     amount=playlist.get_all_user_owned_playlists() #populates playlist of current user who is logged in
     #upon exiting session, pop all data from this session?
-    authtoken.save_playlist_amount(amount)
+    #authtoken.save_playlist_amount(amount)
     #what will i put when user is not logged in? just display generic daily drive playlists for now?
     #i should make a function that deletes (or matches) the json database with current playlsit files. if the current playlist is not response from spotify, but is in my json, delete it (the order given from spotify should equal the order in the json, so we can match by id key and name) 
     #the other option is to delete the json file each time and simply create a new one, but that is time costly 
+    query = {"_id": uid}
+    update = { "$set": {f"playlists_amount" : amount}}
+    mongo.db.user.update_one(query, update)
     return None
 #print (info["external_urls"]["spotify"]) #make this into its own separate function as get_playlist_url in search.py
 

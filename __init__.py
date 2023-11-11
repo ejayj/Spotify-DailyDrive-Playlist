@@ -74,24 +74,20 @@ def index():
         session.permanent = True
         session["user"]=info["uid"] #...log them in
         print("user now in session:")
-        print('hi0')
         print(session.get('user'))
-        print('hi1')
         main.set_uid(session.get('user'))
-        print('hi2')
         data=list(mongo.db.playlists.find({ "_id" : info["uid"] })) 
-        print('hi3')
         #data=data[0]["playlists"] #we cant check to see if we have all of their playlists, if it returns and error of 0 for getingt their playlists
         main.get_user_playlists()
         #if len(data) == mongo.db.user.find({ "_id" : info["uid"] })[0]['playlists_amount']: #if the length of data in db equals the playlist number we have on file for them, skip this  step
         #    main.get_user_playlists()
         #im going to want a loading div for while this happens as it gets all the user owned playlists
-        
-
         #print("we reach here")
         data = list(mongo.db.playlists.find({ "_id" : session.get('user') })) #or playlist id or name ( i can make my own search function)
         data=data[0]["playlists"]
         maxindex=len(data)-1
+
+        
         #print("printing")
         #print(data)
         return render_template('index.html', data=data, maxindex=maxindex)
