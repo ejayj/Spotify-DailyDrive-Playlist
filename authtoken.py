@@ -326,7 +326,7 @@ def get_accesstokenold():
         
         uid=session.get('user')
         accesstoken = get_token()
-        print(uid)
+        #print(uid)
     else:
         get_userinfo(code) #refreshes set user id if not already set and user is logged in
     return accesstoken
