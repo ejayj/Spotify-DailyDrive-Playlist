@@ -1,4 +1,4 @@
-var redirect_uri = "http://192.168.1.19:80/";
+var redirect_uri = "http://127.0.0.1:80/";
 var CLIENT_ID="1f69a9d216f6424f92fb177324f1e06c";
 var CLIENT_SECRET="6049a8ed4fc9431b92cd0476b6ba039a";
 var code="";
@@ -11,7 +11,7 @@ function RA(){
     //url += "&show_dialog=true"; //force user to login again?
     //url += "&state=xyz" //i should add some adqeuate code here
     url += "&scope=playlist-read-private playlist-modify-public playlist-modify-private ugc-image-upload user-read-private";
-    url += "&redirect_uri=http://192.168.1.19:80/"
+    url += "&redirect_uri=http://127.0.0.1:80/"
     window.location.href = url; //show spotify's auth screen
 }
 

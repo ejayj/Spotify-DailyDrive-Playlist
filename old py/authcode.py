@@ -20,7 +20,7 @@ client_secret = "6049a8ed4fc9431b92cd0476b6ba039a"
 auth_headers = {
     "client_id": client_id,
     "response_type": "code",
-    "redirect_uri": "http://192.168.1.19:80/authorize",
+    "redirect_uri": "http://127.0.0.1:80/authorize",
     "scope": "playlist-read-private playlist-modify-public playlist-modify-private ugc-image-upload user-read-private"
 }
 

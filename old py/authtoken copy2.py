@@ -37,7 +37,7 @@ def get_token():
         "Content-Type": "application/x-www-form-urlencoded"
     }
     data = {"code": code,
-            "redirect_uri": "http://192.168.1.19:80/",
+            "redirect_uri": "http://127.0.0.1:80/",
             "grant_type": "authorization_code" } #was client_credentials
     result = post(url, data=data, headers=headers)
     json_result = json.loads(result.content)
