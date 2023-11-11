@@ -18,8 +18,12 @@ from datetime import datetime
 
 load_dotenv()
 
-client_id = os.getenv("CLIENT_ID")
-client_secret = os.getenv("CLIENT_SECRET")
+#put this in .env file ventually
+#client_id = os.getenv("CLIENT_ID")
+#client_secret = os.getenv("CLIENT_SECRET")
+
+client_id="1f69a9d216f6424f92fb177324f1e06c"
+client_secret="6049a8ed4fc9431b92cd0476b6ba039a"
 #get this after getting user data
 code = ""
 refresh_token = "" #set this to database value
@@ -47,7 +51,7 @@ def get_token():
         print("how did we end up here? No user in session, yet we're getting an auth code.")
         exit(0)
         
-    auth_string = client_id + ":" + client_secret
+    auth_string = f"{client_id}:{client_secret}"
     auth_bytes = auth_string.encode("utf-8")
     auth_base64 = str(base64.b64encode(auth_bytes), "utf-8")
     
