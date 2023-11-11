@@ -7,7 +7,7 @@
 <script src="script.js"></script>
 
 <script>
-    var redirect_uri = "http://192.168.1.19:80/authorize/";
+    var redirect_uri = "http://127.0.0.1:80/authorize/";
 var CLIENT_ID="1f69a9d216f6424f92fb177324f1e06c";
 var CLIENT_SECRET="6049a8ed4fc9431b92cd0476b6ba039a";
 var code="";
@@ -60,7 +60,7 @@ function RA(){
     url += "&response_type=code";
     url += "&show_dialog=true";
     url += "&scope=playlist-modify-public";
-    url += "&redirect_uri=http://192.168.1.19:80/authorize/"
+    url += "&redirect_uri=http://127.0.0.1:80/authorize/"
     window.location.href = url; //show spotify's auth screen
 
     var parsedHash = new URLSearchParams(
