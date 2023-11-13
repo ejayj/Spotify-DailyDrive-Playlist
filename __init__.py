@@ -75,8 +75,10 @@ def index():
         session["user"]=info["uid"] #...log them in
         print("user now in session:")
         print(session.get('user'))
-        main.set_uid(session.get('user'))
-        data=list(mongo.db.playlists.find({ "_id" : info["uid"] })) 
+        #main.set_uid(session.get('user')) #THIS IS IMPORTANT*** -it gets all of the user's playlists. This is commented out to save the amount of API requests we make to spotify :)
+        #data=list(mongo.db.playlists.find({ "_id" : info["uid"] })) 
+        
+        
         #data=data[0]["playlists"] #we cant check to see if we have all of their playlists, if it returns and error of 0 for getingt their playlists
         #main.get_user_playlists(session.get('user'))
         #if len(data) == mongo.db.user.find({ "_id" : info["uid"] })[0]['playlists_amount']: #if the length of data in db equals the playlist number we have on file for them, skip this  step
@@ -183,7 +185,7 @@ def podcasts():
     message=""
     data = list(mongo.db.playlists.find({ "_id" : session.get('user') })) #or playlist id or name ( i can make my own search function)
     podcasts=data[0]["podcasts"]
-    maxindex=len(podcasts)-1
+    maxindex=len(podcasts)
     
     urlarray=[]
 
@@ -195,24 +197,37 @@ def podcasts():
         urlarray.append(url)
         #print(url)
         #we should make an erro rmessage - podcast already added!
-    if request.method == "POST":
+
+    if request.method == "POST": #find a way to automatically load changes but also display message?
         try:
-            if request.form["submission"]:
+            if request.form["submission"]: #this should be a more efficient search, should display your saved/followed podcasts, and also allowm for a paste of a url 
                 submission = request.form["submission"]
                 message=main.add_podcast_to_list(submission)
+
         except:
             if request.form["podname"]:
                 pod = request.form["podname"]
                 podid= request.form["podid"]
                 message=f"deleted: {pod}" #this should probably be an alert asking if you're sure you want to delete podname
-                result=""
-                mongo.db.playlists.update_one({ "_id" : session.get('user') }, { '$pull': {"podcasts.$.id" : podid} } )
-                
+                result = mongo.db.playlists.update_one({"_id": session.get('user')}, { '$pull': {"podcasts": { "id" : podid}} } )
                 print("deleting")
                 print(result)
-                #return redirect(url_for('podcasts'))
-                #redirect(url_for('podcasts'))
-
+                
+        #reload data based on changes above
+ 
+        data = list(mongo.db.playlists.find({ "_id" : session.get('user') })) #or playlist id or name ( i can make my own search function)
+        podcasts=data[0]["podcasts"]
+        maxindex=len(podcasts) #i had to set this without -5 because it wouldn't show the last podcast :()
+        urlarray=[]
+        
+        for podcast in podcasts:
+            id = podcast["uri"].split(':')
+            id=id[2]
+            #print(id)
+            url=f"https://open.spotify.com/episode/{id}"
+            urlarray.append(url)
+    
+    #todo next: allow a reshuffle of which order the playlists are in!
     return render_template('podcasts.html', message=message, podcasts=podcasts, maxindex=maxindex, urlarray=urlarray)
 
 @app.route("/deleteuser", methods=["POST", "GET"])
