@@ -274,6 +274,13 @@ def add_podcast_to_list_old(token,name):
     
     return f'podcast: {podcast_name} added'
 
+# function to get all podcasts in list - added by fio
+def get_all_podcasts_for_user(user_id):
+    user_playlists = mongo.db.playlists.find_one({'_id': user_id})
+    if user_playlists:
+        return user_playlists.get('podcasts', [])
+    return []
+
 def check_is_podcast_listed(podcast_name):
     file=open('podcasts.json','r+')
     json_data=json.load(file)

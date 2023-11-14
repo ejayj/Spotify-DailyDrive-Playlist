@@ -1,8 +1,3 @@
-#bootstrap-overrides { /* 100+1=101 priority score, yay! */
-    line-height: 1;
-    color: inherit;
-  }
-
 div#loading {
     top: 200 px;
     margin: auto;

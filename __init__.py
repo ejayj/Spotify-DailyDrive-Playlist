@@ -176,13 +176,29 @@ def logout():
     session.pop("user", None)
     return redirect(url_for('index'))
 
-@app.route("/podcasts", methods=["POST", "GET"])
+@app.route("/podcasts", methods=["POST", "GET"]) #add podcasts page
 def podcasts():
+    #<a href="{{ url_for('{{ urlarray[i]  }} ') }}"> {{podcasts[i]["name"] }} </a>
+    #want to implementth is above, upon click open episode in new window
     message=""
+    data = list(mongo.db.playlists.find({ "_id" : session.get('user') })) #or playlist id or name ( i can make my own search function)
+    podcasts=data[0]["podcasts"]
+    maxindex=len(podcasts)-1
+    
+    urlarray=[]
+
+    for podcast in podcasts:
+        id = podcast["uri"].split(':')
+        id=id[2]
+        #print(id)
+        url=f"open.spotify.com/episode/{id}"
+        urlarray.append(url)
+        #print(url)
+        
     if request.method == "POST":
         submission = request.form["submission"]
         message=main.add_podcast_to_list(submission)
-    return render_template('podcasts.html', message=message)
+    return render_template('podcasts.html', message=message, podcasts=podcasts, maxindex=maxindex, urlarray=urlarray)
 
 @app.route("/deleteuser", methods=["POST", "GET"])
 def deleteuser():
