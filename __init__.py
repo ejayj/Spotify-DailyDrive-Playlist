@@ -78,7 +78,7 @@ def index():
         main.set_uid(session.get('user'))
         data=list(mongo.db.playlists.find({ "_id" : info["uid"] })) 
         #data=data[0]["playlists"] #we cant check to see if we have all of their playlists, if it returns and error of 0 for getingt their playlists
-        main.get_user_playlists(session.get('user'))
+        #main.get_user_playlists(session.get('user'))
         #if len(data) == mongo.db.user.find({ "_id" : info["uid"] })[0]['playlists_amount']: #if the length of data in db equals the playlist number we have on file for them, skip this  step
         #    main.get_user_playlists()
         #im going to want a loading div for while this happens as it gets all the user owned playlists

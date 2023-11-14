@@ -17,7 +17,7 @@ def run_playlist_script(playlistid):
     return url
 
 def get_user_playlists(uid):
-    #playlist.setglobalvariables() #we dont need this anymore because we fixed sessions
+    playlist.setglobalvariables() #we dont need this anymore because we fixed sessions
     amount=playlist.get_all_user_owned_playlists() #populates playlist of current user who is logged in
     #upon exiting session, pop all data from this session?
     #authtoken.save_playlist_amount(amount)

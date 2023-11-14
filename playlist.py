@@ -684,8 +684,9 @@ def get_all_user_owned_playlists(): #how to get all only my playlists
     offset = 0 #int to 1100 for test, start at 0 for actual
     uid=session.get('user')
     url = f"https://api.spotify.com/v1/users/{uid}/playlists?limit=50&offset={offset}" #limit is set to 50 because thats the max, i can also omit it altogether
-    headers = {"Authorization": "Bearer " + token}#, "Content-Type": "image/jpeg"} 
+    headers = {"Authorization": "Bearer " + authtoken.get_token()}#, "Content-Type": "image/jpeg"} 
     result = requests.get(url, headers=headers)
+    print(result)
     json_result = json.loads(result.content)
     
     total_playlists = json_result['total'] #get total of playlists I have
@@ -901,10 +902,10 @@ def set_token(t):
         return None
     return token
 
-#def setglobalvariables():
-#    set_userid()
-#    set_token(session.get('accesstoken'))
-#    return None
+def setglobalvariables():
+    set_userid()
+    set_token(session.get('accesstoken'))
+    return None
 # NEXT TO DO:
 
 #make it a web app first - how to make python a compiled app /w gui?
