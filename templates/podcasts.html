@@ -19,7 +19,12 @@
             {%for i in range(0, maxindex)%}
             <li class="my-1 is-dark" id="ply">
                 <h1 class="subtitle is-fullwidth is-size-6" style="text-align: left; display: inline;">
-                    {{podcasts[i]["name"] }}
+                    <a href="{{urlarray[i]}}">{{podcasts[i]["name"] }}</a> 
+                    <form action="{{url_for('podcasts')}}" method="POST">
+                        <input type="submit" value="delete">
+                        <input type="hidden" value="{{podcasts[i]["name"] }}" name="podname">
+                        <input type="hidden" value="{{podcasts[i]["id"] }}" name="podid">
+                    </form>
                 </h1>
             </li>
             {%endfor%}

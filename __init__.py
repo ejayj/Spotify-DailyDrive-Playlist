@@ -191,13 +191,28 @@ def podcasts():
         id = podcast["uri"].split(':')
         id=id[2]
         #print(id)
-        url=f"open.spotify.com/episode/{id}"
+        url=f"https://open.spotify.com/episode/{id}"
         urlarray.append(url)
         #print(url)
-        
+        #we should make an erro rmessage - podcast already added!
     if request.method == "POST":
-        submission = request.form["submission"]
-        message=main.add_podcast_to_list(submission)
+        try:
+            if request.form["submission"]:
+                submission = request.form["submission"]
+                message=main.add_podcast_to_list(submission)
+        except:
+            if request.form["podname"]:
+                pod = request.form["podname"]
+                podid= request.form["podid"]
+                message=f"deleted: {pod}" #this should probably be an alert asking if you're sure you want to delete podname
+                result=""
+                mongo.db.playlists.update_one({ "_id" : session.get('user') }, { '$pull': {"podcasts.$.id" : podid} } )
+                
+                print("deleting")
+                print(result)
+                #return redirect(url_for('podcasts'))
+                #redirect(url_for('podcasts'))
+
     return render_template('podcasts.html', message=message, podcasts=podcasts, maxindex=maxindex, urlarray=urlarray)
 
 @app.route("/deleteuser", methods=["POST", "GET"])
