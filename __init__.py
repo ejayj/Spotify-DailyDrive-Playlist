@@ -7,6 +7,7 @@ from flask_session import Session
 from datetime import timedelta
 from db import db, mongo
 
+
 mongo_client=""
 def create_app():
     global mongo_client
@@ -62,7 +63,12 @@ def index():
     token = request.args.get('code')
     
     data = list(mongo.db.playlists.find({ "_id" : "Default" })) #or playlist id or name ( i can make my own search function)
-    data=data[0]["playlists"]
+    try:
+        data=data[0]["playlists"]
+        maxindex=len(data)-1
+    except:
+        print("error with Data, line 67")
+        pass
     maxindex=len(data)-1
     
     if token == None and not "user" in session: #or if user not already logged in
