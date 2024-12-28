@@ -10,7 +10,7 @@ import requests
 from flask_sqlalchemy import SQLAlchemy
 from flask import session
 from flask_session import Session
-from __init__ import app
+# from __init__ import app
 #from . import db
 from db import db, mongo
 from models import User
@@ -61,7 +61,7 @@ def get_token():
         "Content-Type": "application/x-www-form-urlencoded"
     }
     data = {"code": code,
-            "redirect_uri": "http://127.0.0.1:80/",
+            "redirect_uri": "http://127.0.0.1:5000/",
             "grant_type": "authorization_code" } #was client_credentials
     result = post(url, data=data, headers=headers)
     json_result = json.loads(result.content)
@@ -213,7 +213,7 @@ def get_token_firsttime(code):
         "Content-Type": "application/x-www-form-urlencoded"
     }
     data = {"code": code,
-            "redirect_uri": "http://127.0.0.1:80/",
+            "redirect_uri": "http://127.0.0.1:5000/",
             "grant_type": "authorization_code" } #was client_credentials
     result = post(url, data=data, headers=headers)
     json_result = json.loads(result.content)
@@ -257,6 +257,7 @@ def get_userinfo(code): #how to get only my playlists, -> NOTE: {offset} simply 
         "uid" : json_result["id"],
         "image" : json_result['images'][0]['url']
     }
+    
     if not User.query.filter_by(uid=data["uid"]).first(): #if they don't exist, save them
         user = User(username=data["name"], uid=data["uid"], image_file=data["image"], authcode=code, refreshtoken=refresh_token, accesstoken=session.get('accesstoken')) #this can go into get_userinfo now
         db.session.add(user)

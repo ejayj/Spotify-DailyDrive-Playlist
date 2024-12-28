@@ -109,6 +109,10 @@ def index():
         print("3 user already logged in. user:")
         print(session.get('user'))
         session["user"]=session.get('user')
+        # print("deleting user:")
+        # print(session.get('user'))
+        # deleteuser()
+        
         return render_template('index.html', data=data, maxindex=maxindex)
 
 @app.route("/createplaylist", methods=["POST", "GET"])
@@ -300,8 +304,9 @@ def test():
     return render_template('test.html')
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=80)
+    app.run(debug=True, host="0.0.0.0", port=5000) #80
 
+# main.delete_user("31dck52ytkqtrzfat2rb6ox5z72y")
 
 #print(main.add_podcast_to_list("Radio Headspace"))
 
@@ -317,7 +322,7 @@ if __name__ == "__main__":
 #main.delete_user("31dck52ytkqtrzfat2rb6ox5z72y")
 #print(mongo.db.playlists.find_one())
 
-#user = User.query.filter_by(username="poop").first()
+#                                               user = User.query.filter_by(username="poop").first()
 #print(user)
 #db.session.delete(user)
 #db.session.commit()

@@ -41,3 +41,9 @@ to check if mongodb is working: brew services list
 
 use: mongosh
 > to start using mongodb
+use mongo compass app for a gui of the data base
+or use: brew services stop mongodb-community@8.0
+
+next: 
+add the redirect URI to the JavaScript code and make sure it is in line with the allowed redirect UR as on Spotify
+change the redirect uri everywhere it shows up: so far: authtoken.py, and script.js
