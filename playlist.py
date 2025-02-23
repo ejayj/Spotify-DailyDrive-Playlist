@@ -528,8 +528,15 @@ def duplicate_original_daily_drive_tracks(token,playlist_id): #took away playlis
 def add_dd_opening_track():#I can also save the uri's of the opening track and build them as needed
     print('Adding Opening Track...')
     p_id='37i9dQZF1EfFTETp5u0zCK' #static, the daily drive id shouldn't change... if it does, I can use the search podcast feature to keep this id up to date
-    opening_uri=search.get_spotify_dd_opening(token,p_id)
+    opening_uri=search.get_spotify_dd_opening(token,p_id) # alt uri
+    if opening_uri=="error": #if error finding dd opening track, add default
+        print("error finding dd opening track, adding default track") #6S1kSZwTOv93ZmClI5tekm?si=9eab464054c841dd
+        #opening_uri="6S1kSZwTOv93ZmClI5tekm?si=9eab464054c841dd"
+        #result=add_single_to_playlist(get_saved_playlist_id(),opening_uri,0)
+        #print(result)
+        return "error"
     result=add_single_to_playlist(get_saved_playlist_id(),opening_uri,0) #adds the uri to the begining of the playlist. Ideally, this should be done after populating the playlist with tracks
+    #what if i save the individual track uris for days of the week, or just make my own audio?
     return result
 
 def delete_old_custom_dd_playlist(): #according to spotify, for all intents and purposes this is really essentially unfollowing a playlist
@@ -663,7 +670,7 @@ def get_user_owned_playlists(limit,offset): #how to get only my playlists,
     #print('Playlist Image Updated')
     
     for index, items in enumerate(json_result['items']):
-        if(json_result['items'][index]['owner']['display_name']==authtoken.get_user_db_info.username):
+        if(json_result['items'][index]['owner']['display_name']==session.get("displayname")):#authtoken.get_user_db_info.username):
             name = json_result['items'][index]['name']
             id = json_result['items'][index]['id']
             owner = json_result['items'][index]['owner']['display_name']
@@ -699,6 +706,8 @@ def get_all_user_owned_playlists(): #how to get all only my playlists
     total_playlists = json_result['total'] #get total of playlists I have
     #offset = json_result['offset'] #current offset of playlists, this ups automatically until the end
     playlist_count = 0 #count how many playlists are mine
+    tempdict = {}
+    templist=[]
     
     while offset < total_playlists: #when offset reaches max number of playlist stops
  
@@ -706,12 +715,41 @@ def get_all_user_owned_playlists(): #how to get all only my playlists
         result = requests.get(url, headers=headers)
         json_result = json.loads(result.content)
         
+        username=session.get('displayname')
+        
         for index, items in enumerate(json_result['items']): #iterate through this page of playlists
-            if(json_result['items'][index]['owner']['display_name']==authtoken.get_current_user_db_info().username): #if the playlists are mine... add them to the json (or in this case, the list of available playlists to choose from)  NOTE: for spotify featured playlists and not my own, I can simply do playlists that aren't mine w/ !, or get rid of if altogether for all resuls (there's 1290 though)
+            if(json_result['items'][index]['owner']['display_name']==username): #if the playlists are mine... add them to the json (or in this case, the list of available playlists to choose from)  NOTE: for spotify featured playlists and not my own, I can simply do playlists that aren't mine w/ !, or get rid of if altogether for all resuls (there's 1290 though)
                 id = json_result['items'][index]['id']
-                result=add_playlist_to_list(id)
+                #result=add_playlist_to_list(id) #***** HOW TO BULK ADD??
+                
+                print("playlist count update:")
+                print(playlist_count)
+                
                 #print(authtoken.get_current_user_db_info().username)
                 playlist_count=playlist_count+1
+                
+                name = json_result['items'][index]['name']
+                owner = json_result['items'][index]['owner']['display_name']
+                id = json_result['items'][index]['id']
+                
+                try:
+                    image = json_result['items'][index]['images'][0]["url"] #or []"images"][0]["url"] or ["images"]["url"][0]
+                except: #if there is no image for some strange reason. Add generic?
+                    image = None
+                    
+                data = {
+                    "name": f"{name}",
+                    "owner": f"{owner}",
+                    "id": f"{id}",
+                    #"url": f"{playlist_url}", #do we need to store this?
+                    "image": f"{image}" #may take this out, as its a variable i put in
+                }
+                
+                
+                print(data)
+                tempdict.update(data)
+                templist.append(data)
+            
                 if result == False:
                     print('error getting user owned playlists')
                     break
@@ -720,7 +758,82 @@ def get_all_user_owned_playlists(): #how to get all only my playlists
         #print(total_playlists)
         #print()
         offset = offset + 50 #next group of playlists
-              
+        
+        # if offset==50: #foor testing python dic
+        #     print("done")
+        #     break
+        
+        #NEXT: How to bulk add? [done]
+        #NEXT NEXT: How to get all platlists? (because i am missing a few when adding. does this issue get solved with first todo?)
+
+    print("final value:")
+    print(playlist_count)
+    print()
+    #return json_result
+    #print(templist)
+    uid = session.get('user')
+    result=mongo.db.playlists.insert_many(
+        { '_id': uid }, #specify the document
+        { '$addToSet': { 'playlists': templist } } # must be array. addtoset only adds if it doesnt already exist in array! useful for playlist@
+    )
+    #look into: TypeError: documents must be a non-empty list
+    if "'updatedExisting': True" in str(result):
+        #print("true")
+        return f'{playlist_count} playlists added'
+        #return True
+        
+    return playlist_count
+
+
+def get_all_user_owned_playlists_old(): #how to get all only my playlists
+    offset = 0 #int to 1100 for test, start at 0 for actual
+    uid=session.get('user')
+    url = f"https://api.spotify.com/v1/users/{uid}/playlists?limit=50&offset={offset}" #limit is set to 50 because thats the max, i can also omit it altogether
+    headers = {"Authorization": "Bearer " + authtoken.get_token()}#, "Content-Type": "image/jpeg"} 
+    result = requests.get(url, headers=headers)
+    print(result)
+    json_result = json.loads(result.content)
+    
+    total_playlists = json_result['total'] #get total of playlists I have
+    #offset = json_result['offset'] #current offset of playlists, this ups automatically until the end
+    playlist_count = 0 #count how many playlists are mine
+    
+    while offset < total_playlists: #when offset reaches max number of playlist stops
+ 
+        url = f"https://api.spotify.com/v1/users/{uid}/playlists?limit=50&offset={offset}"
+        result = requests.get(url, headers=headers)
+        json_result = json.loads(result.content)
+        
+        username=session.get('displayname') #previously, the if(json_result) would equal a db. get username request.
+            
+        for index, items in enumerate(json_result['items']): #iterate through this page of playlists
+            if(json_result['items'][index]['owner']['display_name']==username): #if the playlists are mine... add them to the json (or in this case, the list of available playlists to choose from)  NOTE: for spotify featured playlists and not my own, I can simply do playlists that aren't mine w/ !, or get rid of if altogether for all resuls (there's 1290 though)
+                id = json_result['items'][index]['id']
+                result=add_playlist_to_list(id) #***** HOW TO BULK ADD??
+                
+                print("playlist count update:")
+                print(playlist_count)
+                
+                #print(authtoken.get_current_user_db_info().username)
+                playlist_count=playlist_count+1
+                
+                name = json_result['items'][index]['name']
+                owner = json_result['items'][index]['owner']['display_name']
+                id = json_result['items'][index]['id']
+                print(f'{index}. {name}, {id}, {owner}')
+            
+                if result == False:
+                    print('error getting user owned playlists')
+                    break
+    
+        #print(offset) prints progress; when offset is >total playlists the loop closes
+        #print(total_playlists)
+        #print()
+        offset = offset + 50 #next group of playlists
+
+    print("final value:")
+    print(playlist_count)
+    print()
     #return json_result
     return playlist_count
 
@@ -810,19 +923,73 @@ def check_is_playlist_listed(playlist_id):
             return True
     return False #if all elements are cycled through, returns false
 
-def add_playlist_to_list(playlist_id,genre="Undefined"):
-    playlist=search.get_playlist_info(playlist_id) #make this a search function that matched id to name?
+def add_playlist_to_list(playlist_id):
+    playlist=search.get_playlist_info_new(playlist_id) #make this a search function that matched id to name?
+    playlist_image=playlist["playlist_image"]
+    playlist=playlist["playlist"]
+    
     playlist_name=playlist['name']
     playlist_owner=playlist['owner']['display_name']
     playlist_id=playlist['id']
     playlist_url=playlist['external_urls']['spotify']
+    print("playlist image:")
+    try:
+        print(playlist_image[0]["url"])
+        playlist_image=playlist_image[0]["url"]
+    except:
+        print("playlist_image error, here's the json with no []")
+        print(playlist_image)
+        playlist_image="None"
     
     data = {
             "name": f"{playlist_name}",
             "owner": f"{playlist_owner}",
             "id": f"{playlist_id}",
             "url": f"{playlist_url}",
-            "genre": f"{genre}" #may take this out, as its a variable i put in
+            "image": f"{playlist_image}" #may take this out, as its a variable i put in
+        }
+    
+    uid = session.get('user')
+    result=mongo.db.playlists.update_one(
+        { '_id': uid }, #specify the document
+        { '$addToSet': { 'playlists': data } } # must be array. addtoset only adds if it doesnt already exist in array! useful for playlist@
+    )
+    
+    if "'updatedExisting': True" in str(result):
+        #print("true")
+        return f'playlists: {playlist_name} added'
+        #return True
+    
+    #if its already in the array it will skip it automatically!
+    print(f'could not add playlist: {playlist_name} [NOT ADDED]')
+    return None
+
+
+def add_multiple_playist_to_list(playlist_id): #deprecated, not finished
+    playlist=search.get_playlist_info_new(playlist_id) #make this a search function that matched id to name?
+    playlist_image=playlist["playlist_image"]
+    playlist=playlist["playlist"]
+    
+    playlist_name=playlist['name']
+    playlist_owner=playlist['owner']['display_name']
+    playlist_id=playlist['id']
+    playlist_url=playlist['external_urls']['spotify']
+    
+    try:
+        # print("playlist image:")
+        # print(playlist_image[0]["url"])
+        playlist_image=playlist_image[0]["url"]
+    except:
+        # print("playlist_image error, here's the json with no []")
+        # print(playlist_image)
+        playlist_image="None"
+    
+    data = {
+            "name": f"{playlist_name}",
+            "owner": f"{playlist_owner}",
+            "id": f"{playlist_id}",
+            "url": f"{playlist_url}", #do we need to store this?
+            "image": f"{playlist_image}" #may take this out, as its a variable i put in
         }
     
     uid = session.get('user')

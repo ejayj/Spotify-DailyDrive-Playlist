@@ -252,11 +252,18 @@ def get_userinfo(code): #how to get only my playlists, -> NOTE: {offset} simply 
     #print(json_result)
 
     #print(json_result)
-    data= {
-        "name" : json_result["display_name"],
-        "uid" : json_result["id"],
-        "image" : json_result['images'][0]['url']
-    }
+    try:
+        data= {
+            "name" : json_result["display_name"],
+            "uid" : json_result["id"],
+            "image" : json_result['images'][0]['url']
+        }
+    except:
+        data= {
+            "name" : json_result["display_name"],
+            "uid" : json_result["id"],
+            "image" : "None"
+        }
     
     if not User.query.filter_by(uid=data["uid"]).first(): #if they don't exist, save them
         user = User(username=data["name"], uid=data["uid"], image_file=data["image"], authcode=code, refreshtoken=refresh_token, accesstoken=session.get('accesstoken')) #this can go into get_userinfo now
@@ -456,7 +463,7 @@ def delete_user(userid):
     resultA=mongo.db.user.delete_one({"_id": userid})
     resultB=mongo.db.playlists.delete_one({"_id": userid})
     if "acknowledged=True" in str(resultA) and "acknowledged=True" in str(resultB):
-        print("Sucess")
+        print("Sucess - user deteleted")
         return True
     print("error")
     print(resultA)

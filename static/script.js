@@ -15,6 +15,19 @@ function RA(){
     window.location.href = url; //show spotify's auth screen
 }
 
+function hi() { //hides div and shows loading div on button click
+  //window.alert("hi"); //testcase
+
+  // display=getComputedStyle(document.getElementById('loadingscreen')).getPropertyValue('display');
+  display=getComputedStyle(document.getElementById('loadingscreen')).getPropertyValue('display');
+
+  if (display=="none") {
+    document.getElementById("loadingscreen").style.display = 'block';
+  } else {
+    document.getElementById("loadingscreen").style.display = "none";
+  }
+}
+
 function search_animal() {
     let input = document.getElementById('searchbar').value
     input=input.toLowerCase(); //I may want to get rid of this for my case sensitive playlists

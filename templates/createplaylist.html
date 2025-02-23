@@ -3,38 +3,25 @@
 
 {% block content%}
 <!-- Loading Screen DIV-->
-
-<script type="text/javascript">  //hides div and shows loading div on button click
-    function myFunction() {
-        document.getElementById("content").style.display = "none";
-        document.getElementById("loadingscreen").style.display = 'block';
-    } 
-</script>
-
-<div id="loadingscreen" style="display: none;
-margin: auto;
-width: 50%;
-padding: 10px;
-text-align: center;">
-    <div class="spinner-grow" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-    Loading...
-</div>
-
 <!-- end loading screen div -->
 
 <div class="columns">
     <div class="column is-half is-offset-one-quarter has-text-centered">
+        
         <h1 class="title">Create daily drive with {{ playlistname }}?</h1>
         <form action="#" onsubmit="myFunction()" method="post">
             <input class="button m-2 is-medium is-dark" style="background-color: #1db954;" type="submit" value="yes"
-                name="submission" id="{{ id }}">
+                name="submission" id="{{ id }}" onclick="hi()">
             <!--//this will trigger python script - how to get live update from ptyhon script in loading screen?  -->
             <input class="button m-2 is-medium is-danger" type="submit" value="no" name="submission">
             <!-- //also acts as a go back button -->
         </form>
+
+            <div id="loadingscreen" class="loader" style="display: none;">
+                <span id="testing">Please Wait :)</span>
+            </div>
     </div>
+    
 </div>
 <style>
     body {

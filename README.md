@@ -47,3 +47,6 @@ or use: brew services stop mongodb-community@8.0
 next: 
 add the redirect URI to the JavaScript code and make sure it is in line with the allowed redirect UR as on Spotify
 change the redirect uri everywhere it shows up: so far: authtoken.py, and script.js
+
+
+If i want another user to use my app, i have to approve them

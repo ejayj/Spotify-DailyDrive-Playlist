@@ -24,8 +24,10 @@ def get_user_playlists(uid):
     #what will i put when user is not logged in? just display generic daily drive playlists for now?
     #i should make a function that deletes (or matches) the json database with current playlsit files. if the current playlist is not response from spotify, but is in my json, delete it (the order given from spotify should equal the order in the json, so we can match by id key and name) 
     #the other option is to delete the json file each time and simply create a new one, but that is time costly 
+    print("final amount (passed value):")
+    print(amount)
     query = {"_id": uid}
-    update = { "$set": {f"playlists_amount" : amount}}
+    update = { "$set": {f"playlists_amount" : "756"}}
     mongo.db.user.update_one(query, update)
     return None
 #print (info["external_urls"]["spotify"]) #make this into its own separate function as get_playlist_url in search.py

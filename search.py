@@ -82,12 +82,24 @@ def get_dd_id(token):
 
 
 def get_spotify_dd_opening(token, playlist_id):
-    url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks?offset=0&limit1"
+    playlist_id="37i9dQZF1EfFTETp5u0zCK"
+    daily_drive_album="1qvRrl85vhiJnPU5CVoWIE"
+    #url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks?offset=0&limit1" #THIS IS FOR PLAYLIST
+    url = f"https://api.spotify.com/v1/albums/{daily_drive_album}/tracks?offset=0&limit1" #THIS IS FOR ALBUMS; #offset is 1, but how can i change this for different days of the week? 
+    #track 5 is a good transition from music, back to the news
     headers = authtoken.get_auth_header(token)
     result = requests.get(url, headers=headers)
     json_result = json.loads(result.content)
+    if "error" in json_result:
+        print("error")
+        #print(playlist_id)
+        print(json_result)
+        return "error" #default uri: 6S1kSZwTOv93ZmClI5tekm?si=9eab464054c841dd or return "error"
     json_result = json_result["items"]
-    uri = json_result[0]["track"]["uri"]
+    print(json_result)
+    #uri = json_result[0]["track"]["uri"] #for playlist
+    uri = json_result[0]["uri"]#["track]["uri"] previously
+    print("success")
     return uri
 
 def get_playlist_tracks_limit(token, playlist_id,limit):
@@ -249,12 +261,33 @@ def get_podcast_show_title_from_episode_id(token, id):
 #        uris = uris+f'{uri},'
         #print(uris)
         
+def get_playlist_info_new(playlist_id):  #test with 2FRLYxNARiIsJpajtLtzIp - #it will print the emoji of the playust name, but i cannot reverse search that emoji - even in the spotify app you cant search emojis, no use doing it here
+    token=session.get('accesstoken')
+    url = f"https://api.spotify.com/v1/playlists/{playlist_id}"
+    headers = {"Authorization": "Bearer " + token}#, "Content-Type": "application/json"} #or token
+    result = requests.get(url,headers=headers)
+    json_result = json.loads(result.content)#['name']
+    
+    url = f"https://api.spotify.com/v1/playlists/{playlist_id}/images"
+    result = requests.get(url,headers=headers)
+    image_json_result= json.loads(result.content)#['name']
+    
+    json_data = {
+        "playlist": json_result,
+        "playlist_image": image_json_result
+    }
+    return json_data
+
 def get_playlist_info(playlist_id):  #test with 2FRLYxNARiIsJpajtLtzIp - #it will print the emoji of the playust name, but i cannot reverse search that emoji - even in the spotify app you cant search emojis, no use doing it here
     token=session.get('accesstoken')
     url = f"https://api.spotify.com/v1/playlists/{playlist_id}"
     headers = {"Authorization": "Bearer " + token}#, "Content-Type": "application/json"} #or token
     result = requests.get(url,headers=headers)
     json_result = json.loads(result.content)#['name']
+    
+    url = f"https://api.spotify.com/v1/playlists/{playlist_id}/images"
+    #result = requests.get(url,headers=headers)
+    new_json_result=json_result = json.loads(result.content)#['name']
     return json_result
 
 #*********** Above are Support Function Calls ***************#
