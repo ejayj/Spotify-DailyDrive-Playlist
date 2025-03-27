@@ -7,6 +7,7 @@ from db import mongo
 #main playlist thing
 
 def run_playlist_script(playlistid):
+    ##playlist id is for the music playlist id we want
     #authtoken.get_token() #should I auto refresh token? this used to be done automatically, but now in this structure i may have to do it implicitly
     playlist.setglobalvariables() #set uid and token in this function call
     print(playlist.build_daily_drive_playlist(2,playlistid))
@@ -27,8 +28,17 @@ def get_user_playlists(uid):
     print("final amount (passed value):")
     print(amount)
     query = {"_id": uid}
-    update = { "$set": {f"playlists_amount" : "756"}}
-    mongo.db.user.update_one(query, update)
+    update = { "$set": {f"playlists_amount" : "52"}}
+    result2=mongo.db.user.find_one({ "sqlid" : 3})#mongo.db.user.update_one(query, update)
+    #{ "_id" : ObjectId("4ecc05e55dd98a436ddcc47c")
+    result=mongo.db.user.update_one( #ERROR: documents cannot be non empty list
+        { '_id': uid }, #specify the document
+        { '$set': { 'playlists_amount': amount } })
+    #or
+    print(result)
+    
+    #if updated existing is true, then playlist amount has been moified
+    #mongo.db.user.find_one_and_update({"_id" : uid}, { '$set': { 'playlists': amount } })
     return None
 #print (info["external_urls"]["spotify"]) #make this into its own separate function as get_playlist_url in search.py
 

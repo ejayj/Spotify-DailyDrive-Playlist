@@ -89,6 +89,8 @@ def index():
         #main.set_uid(session.get('user')) #THIS IS IMPORTANT*** -it gets all of the user's playlists. This is commented out to save the amount of API requests we make to spotify :)
         #data=list(mongo.db.playlists.find({ "_id" : info["uid"] })) 
         
+        #get user playlists 
+        main.get_user_playlists(session.get('user'))
         data = list(mongo.db.playlists.find({ "_id" : session.get('user') })) #or playlist id or name ( i can make my own search function)
         
         # if data==[]:
@@ -107,13 +109,16 @@ def index():
         #     print(len(mongo.db.playlists.find({ "_id" : info["uid"] })[0]['playlists']))
         #     pass   
 
+        
+        
+        
         if len(data[0]["playlists"]) == mongo.db.user.find({ "_id" : info["uid"] })[0]['playlists_amount']: #if the length of data in db equals the playlist number we have on file for them, skip this  step
             print("everything ok, but should make sure the len(data) saves correctly in the playlist_amount field for mongo db")
         #so len(data) and the amount of playlists from mongodb should be the same since data=mongodb. why is  this not the case?
         #additioanlly, we should get the total number of USER owned playlists from SPOTIFY and compare the number. if it is greater or less than, we need to make the adjustments.
         elif len(data[0]["playlists"]) <=1:
             print("user has 1 or less playlists, getting user")
-            main.get_user_playlists(session.get('uid'))
+            main.get_user_playlists(session.get('user'))
             #im going to want a loading div for while this happens as it gets all the user owned playlists
         elif len(data) == 0: #meaning it results in an error? means there is no user right? need to get info
             print("some sort of error in line 101 with retriving dats. need to get user info?:")
@@ -165,7 +170,7 @@ def createplaylist():
     try:
         id = request.form["id"] #should this be playlsitname as per line 20 of index.html?
         playlistname=request.form["playlistname"]
-        session["id"]=id
+        session["id"]=id #id of music playlist we want
         return render_template('createplaylist.html', id=id, playlistname=playlistname, data=data) #if it reaches here, it is the first page load
     except:
         pass
@@ -191,7 +196,7 @@ def createplaylist():
 
 @app.route("/playlist") #i could even make a pop up saying its been created, and a green spotify go button to go to playlist
 def playlist():
-    url=main.run_playlist_script(session.get('id'))
+    url=main.run_playlist_script(session.get('id')) #passes id of music playlist we want 
     return redirect(url)
 
 @app.route("/404") #figure out how to pass error message! request.args? sessions?
@@ -218,7 +223,8 @@ def login():
     
 @app.route("/logout")
 def logout():
-    print(main.delete_user(session.get('user')))
+    #FOR DEBUG PURPOSES ONLY!!!
+    #print(main.delete_user(session.get('user'))) #THIS FULLY DELETES USER!!
     session.pop("user", None)
     return redirect(url_for('index'))
 

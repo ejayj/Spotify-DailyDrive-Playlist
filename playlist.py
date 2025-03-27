@@ -4,6 +4,7 @@ import base64
 import requests
 import authtoken
 import search
+import time
 from flask import session
 from db import mongo
 #HOW TO IMPORT EVERYTHING IN MODULE?
@@ -63,7 +64,7 @@ def createplaylist(token, user_id):
     give_playlist_image(token,playlist_id,encoded_string)
         
     print(f'New Playlist ID Created: {playlist_id}')
-    return playlist_id
+    return playlist_id #THISSSS WAS THE CAUSE OF ALL MY HEADACHE THIS WHOLE TIME?!!? Next time I have an issue, lets see what actual url request is getting sent over to spotify so i can zero in on the issue.
 
 def remove_track_from_playlist(token,playlist_id,uri):
     url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
@@ -109,22 +110,72 @@ def populate_playlist(playlist_id,uri):
 
 def add_batch_to_playlist(playlist_id,uri): #to  add to playlist at the end, simply use a singular uri in populate_playlist() method
     print('Adding Track URIs To Playlist ...')
+    position=0
+    #uri="spotify:track:01DYbPd31l0rNZlH6fzRNp,spotify:track:64BbK9SFKH2jk86U3dGj2P,spotify:track:3JSuolBBtmqNIcJZYdNxEA,spotify:track:5tFep7dXGd7vEJ668wTPux,spotify:track:3GZD6HmiNUhxXYf8Gch723,spotify:track:3Nsxlv9JESIFfOBbupIKOc,spotify:track:1eCFz60zd7mAXgWLapPd9B,spotify:track:1m8WpLYXEiNVZchsWEcCSy,spotify:track:7sT7kZEYd1MrmzLLIRVZas,spotify:track:5mhd20rH952SFPErYih36i,spotify:track:2v0EIrUzZ9GNNPgk6nLl0j,spotify:track:0j1l4vhNcoI6bhiqjgfBjX,spotify:track:4WkmcS7sW41aVsFdJ2PfT7,spotify:track:5z5ao3FAaVwHk1g7xuOBcB,spotify:track:2ZRo7axmMPeSVUvDbGkJah,spotify:track:5x8Gy4R2HMkb1pQ7MLD5Hc,spotify:track:6iMawKl5uQ2YfdlkQgHTOG,spotify:track:3MAgQuClHcAV8E9CbeBS6f,spotify:track:7eSSmgq26BXr7xay3WKjfi,spotify:track:0oPubOf6Xl0qeIE5PrI8Gt,spotify:track:4nFAUqFou9ZbWNho3jeY1h,spotify:track:0vb9Tgu3IpaKx38Z6xD2nY,spotify:track:1bGP0GMcyN09UkHepzpd0i,spotify:track:6VObnIkLVruX4UVyxWhlqm,spotify:track:7BY005dacJkbO6EPiOh2wb,spotify:track:3rgPcA3yCtvVCxvcVFcBxs,spotify:track:0osMYFRWYi3DQc8qVvofqp,spotify:track:6WUgqFZhbNRaeBuzG2ahfJ"
+    #uri="spotify:track:3rgPcA3yCtvVCxvcVFcBxs"
+    #token=authtoken.get_token()
+    #token=session.get("token")#("rtoken")
     #url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
     url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks?uris={uri}"
-    headers = {"Authorization": "Bearer " + token, "Content-Type": "application/json"} #or token
+    headers = {"Authorization": "Bearer " + authtoken.get_token(), "Content-Type": "application/json"} #or token
+    # url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks?position={position}&uris={uri}"
+    # headers = {"Authorization": "Bearer " + authtoken.get_token(), "Content-Type": "application/json"} #or token
     #we will do get-uri for a track
+    # print("token:")
+    # print(token)
     data = json.dumps({
         "uris": [
             uri
             ]
         })
+    # data = json.dumps({
+    #     "uris": [
+    #         uri
+    #         ],
+    #     "posiion": position
+    #     })
     
     #or
     #data = f'{"uris": ["{uri}"], "position": 0}'
-    
     #NOTE: We got rid of the try-catch statment in this is because, before running this program, we should run the 'update_all_podcasts' function to make sure the uri's are fresh
     result = requests.post(url, headers=headers, data=data)
+    print("result is:")
+    print(result)
+    time.sleep(5)
+    json_result = json.loads(result.content)
     
+    #playlist_id = json_result["id"]
+    return json_result
+
+def add_to_playlist(playlist_id,uri,position=0): #copy of add_single_to_playlist #to  add to playlist at the end, simply use a singular uri in populate_playlist() method
+    #uri="spotify:track:01DYbPd31l0rNZlH6fzRNp" 
+    #uri="spotify:track:5m3C0fBnSOaF3OEMQ2C57r"
+    #uri="spotify:track:01DYbPd31l0rNZlH6fzRNp,spotify:track:64BbK9SFKH2jk86U3dGj2P,spotify:track:3JSuolBBtmqNIcJZYdNxEA,spotify:track:5tFep7dXGd7vEJ668wTPux,spotify:track:3GZD6HmiNUhxXYf8Gch723,spotify:track:3Nsxlv9JESIFfOBbupIKOc,spotify:track:1eCFz60zd7mAXgWLapPd9B,spotify:track:1m8WpLYXEiNVZchsWEcCSy,spotify:track:7sT7kZEYd1MrmzLLIRVZas,spotify:track:5mhd20rH952SFPErYih36i,spotify:track:2v0EIrUzZ9GNNPgk6nLl0j,spotify:track:0j1l4vhNcoI6bhiqjgfBjX,spotify:track:4WkmcS7sW41aVsFdJ2PfT7,spotify:track:5z5ao3FAaVwHk1g7xuOBcB,spotify:track:2ZRo7axmMPeSVUvDbGkJah,spotify:track:5x8Gy4R2HMkb1pQ7MLD5Hc,spotify:track:6iMawKl5uQ2YfdlkQgHTOG,spotify:track:3MAgQuClHcAV8E9CbeBS6f,spotify:track:7eSSmgq26BXr7xay3WKjfi,spotify:track:0oPubOf6Xl0qeIE5PrI8Gt,spotify:track:4nFAUqFou9ZbWNho3jeY1h,spotify:track:0vb9Tgu3IpaKx38Z6xD2nY,spotify:track:1bGP0GMcyN09UkHepzpd0i,spotify:track:6VObnIkLVruX4UVyxWhlqm,spotify:track:7BY005dacJkbO6EPiOh2wb,spotify:track:3rgPcA3yCtvVCxvcVFcBxs,spotify:track:0osMYFRWYi3DQc8qVvofqp,spotify:track:6WUgqFZhbNRaeBuzG2ahfJ,"
+    #position=0
+    #playlist_id=get_saved_playlist_id()
+    url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks?position={position}&uris={uri}"
+    headers = {"Authorization": "Bearer " + authtoken.get_token(), "Content-Type": "application/json"} #or token
+    data = json.dumps({
+        "uris": [
+            uri
+            ],
+        "position": position
+        })
+    
+    #print("we reach here")
+    result = requests.post(url, headers=headers, data=data)
+    # try: #see if spotify will take our url, if it wont then our uri is bad
+    #     result = requests.post(url, headers=headers, data=data)
+    #     #print('ERROR: Old URI)
+    # except:  #if spotify won't take our URI, get a new one amd try again (only once)
+    #     podcast_id = get_podcast_data_from_list(uri,1,2) #get podcast id based off of the uri
+    #     update_podcast(token,podcast_id) #update the list with fresh podcast uri based off found id - this will only take one uri
+    #     print('trying again')
+    #     tries = tries+1 #count number of tries
+    #     if (tries>1): #if this exception was already thrown, cancel out the nested loop
+    #         return 'ERROR: Invalid URI, Too Many Retries'
+    #     add_single_to_playlist(playlist_id,uri,position) #run nested loop
+
     json_result = json.loads(result.content)
     
     #playlist_id = json_result["id"]
@@ -132,14 +183,25 @@ def add_batch_to_playlist(playlist_id,uri): #to  add to playlist at the end, sim
 
 def add_single_to_playlist(playlist_id,uri,position): #to  add to playlist at the end, simply use a singular uri in populate_playlist() method
     #url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+    #token=authtoken.get_token()
+    #token=session.get("token")#("rtoken")
+    # print("token is:")
+    # print(token)
+    #print("current URI:")
+    #time.sleep(10)
+    #print(uri)
+    #uri="spotify:track:01DYbPd31l0rNZlH6fzRNp,spotify:track:64BbK9SFKH2jk86U3dGj2P,spotify:track:3JSuolBBtmqNIcJZYdNxEA,spotify:track:5tFep7dXGd7vEJ668wTPux,spotify:track:3GZD6HmiNUhxXYf8Gch723,spotify:track:3Nsxlv9JESIFfOBbupIKOc,spotify:track:1eCFz60zd7mAXgWLapPd9B,spotify:track:1m8WpLYXEiNVZchsWEcCSy,spotify:track:7sT7kZEYd1MrmzLLIRVZas,spotify:track:5mhd20rH952SFPErYih36i,spotify:track:2v0EIrUzZ9GNNPgk6nLl0j,spotify:track:0j1l4vhNcoI6bhiqjgfBjX,spotify:track:4WkmcS7sW41aVsFdJ2PfT7,spotify:track:5z5ao3FAaVwHk1g7xuOBcB,spotify:track:2ZRo7axmMPeSVUvDbGkJah,spotify:track:5x8Gy4R2HMkb1pQ7MLD5Hc,spotify:track:6iMawKl5uQ2YfdlkQgHTOG,spotify:track:3MAgQuClHcAV8E9CbeBS6f,spotify:track:7eSSmgq26BXr7xay3WKjfi,spotify:track:0oPubOf6Xl0qeIE5PrI8Gt,spotify:track:4nFAUqFou9ZbWNho3jeY1h,spotify:track:0vb9Tgu3IpaKx38Z6xD2nY,spotify:track:1bGP0GMcyN09UkHepzpd0i,spotify:track:6VObnIkLVruX4UVyxWhlqm,spotify:track:7BY005dacJkbO6EPiOh2wb,spotify:track:3rgPcA3yCtvVCxvcVFcBxs,spotify:track:0osMYFRWYi3DQc8qVvofqp,spotify:track:6WUgqFZhbNRaeBuzG2ahfJ" #spotify:track:0Xt1z3YB8UT7w7uFu5aX43
+    #uri="spotify:track:01DYbPd31l0rNZlH6fzRNp,spotify:track:64BbK9SFKH2jk86U3dGj2P,spotify:track:3JSuolBBtmqNIcJZYdNxEA,spotify:track:5tFep7dXGd7vEJ668wTPux,spotify:track:3GZD6HmiNUhxXYf8Gch723,spotify:track:3Nsxlv9JESIFfOBbupIKOc,spotify:track:1eCFz60zd7mAXgWLapPd9B,spotify:track:1m8WpLYXEiNVZchsWEcCSy,spotify:track:7sT7kZEYd1MrmzLLIRVZas,spotify:track:5mhd20rH952SFPErYih36i,spotify:track:2v0EIrUzZ9GNNPgk6nLl0j,spotify:track:0j1l4vhNcoI6bhiqjgfBjX,spotify:track:4WkmcS7sW41aVsFdJ2PfT7,spotify:track:5z5ao3FAaVwHk1g7xuOBcB,spotify:track:2ZRo7axmMPeSVUvDbGkJah,"
+    #uri="spotify:track:01DYbPd31l0rNZlH6fzRNp,spotify:track:64BbK9SFKH2jk86U3dGj2P,spotify:track:3JSuolBBtmqNIcJZYdNxEA,spotify:track:5tFep7dXGd7vEJ668wTPux,spotify:track:3GZD6HmiNUhxXYf8Gch723,spotify:track:3Nsxlv9JESIFfOBbupIKOc,spotify:track:1eCFz60zd7mAXgWLapPd9B,spotify:track:1m8WpLYXEiNVZchsWEcCSy,spotify:track:7sT7kZEYd1MrmzLLIRVZas,spotify:track:5mhd20rH952SFPErYih36i,"
     url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks?position={position}&uris={uri}"
-    headers = {"Authorization": "Bearer " + token, "Content-Type": "application/json"} #or token
+    headers = {"Authorization": "Bearer " + authtoken.get_token(), "Content-Type": "application/json"} #or token
     #we will do get-uri for a track
+    #if invalid token-> refresh token?
     data = json.dumps({
         "uris": [
             uri
             ],
-        "posiion": position
+        "position": position
         })
     
     #or
@@ -177,7 +239,7 @@ def add_podcasts_to_playlist(playlist_id): #this function adds the podcasts in t
             else: 
                 print(podcasts['name'])
                 uri=podcasts['uri']
-                print(add_single_to_playlist(playlist_id, uri, 2)) #Adds ABC News Right After Radio Headspace
+                print(add_single_to_playlist(playlist_id, uri, 2)) #Adds ABC News Right After Radio Headspace. make this special towards me?
                 pos = 7
             
             #write to file
@@ -325,7 +387,7 @@ def update_podcast(token, podcast_id):
     #search if it exists
     for index, podcasts in enumerate(json_data['podcasts']): #cycles through all elements
         if (podcasts['id']==podcast_id):
-            uri = search.get_mostrecent_podcast_uri(token,podcast_id)
+            uri, image = search.get_mostrecent_podcast_uri(token,podcast_id)
             json_data['podcasts'][index]['uri']=f'{uri}' #update uri;
             file=open('podcasts.json','w')
             json.dump(json_data,file,indent=4) #write into file
@@ -344,7 +406,7 @@ def update_all_podcasts(token):
         for x in result:
             for podcasts in x["podcasts"]:
                 podcast_id=podcasts['id']
-                uri = search.get_mostrecent_podcast_uri(token,podcast_id)
+                uri, image = search.get_mostrecent_podcast_uri(token,podcast_id)
                 
                 query = {"_id": session.get("user"), 'podcasts.id' : podcast_id}
                 update = { "$set": {f"podcasts.$.uri" : uri}}
@@ -529,12 +591,17 @@ def add_dd_opening_track():#I can also save the uri's of the opening track and b
     print('Adding Opening Track...')
     p_id='37i9dQZF1EfFTETp5u0zCK' #static, the daily drive id shouldn't change... if it does, I can use the search podcast feature to keep this id up to date
     opening_uri=search.get_spotify_dd_opening(token,p_id) # alt uri
+    #print(opening_uri)
     if opening_uri=="error": #if error finding dd opening track, add default
         print("error finding dd opening track, adding default track") #6S1kSZwTOv93ZmClI5tekm?si=9eab464054c841dd
         #opening_uri="6S1kSZwTOv93ZmClI5tekm?si=9eab464054c841dd"
         #result=add_single_to_playlist(get_saved_playlist_id(),opening_uri,0)
         #print(result)
         return "error"
+    
+    print("adding")
+    #print(get_saved_playlist_id())
+    #print(opening_uri)
     result=add_single_to_playlist(get_saved_playlist_id(),opening_uri,0) #adds the uri to the begining of the playlist. Ideally, this should be done after populating the playlist with tracks
     #what if i save the individual track uris for days of the week, or just make my own audio?
     return result
@@ -623,7 +690,7 @@ def build_daily_drive_playlist(integer,playlist_selection_id): #Creates the dail
             print(update_all_podcasts(token))
             playlist_id=createplaylist(token,user_id)
             uris=search.compile_track_uris(search.get_playlist_tracks(token,playlist_selection_id))
-            print(add_batch_to_playlist(playlist_id,uris))
+            print(add_to_playlist(playlist_id,uris))
             add_dd_opening_track()
             add_podcasts_to_playlist(playlist_id)
             print('Finished Building New Daily Drive With Custom Playlist[No Shuffle]')
@@ -633,8 +700,8 @@ def build_daily_drive_playlist(integer,playlist_selection_id): #Creates the dail
             print(update_all_podcasts(token))
             playlist_id=createplaylist(token,user_id)
             uris=search.shuffle_compile_playlists_tracks(playlist_selection_id)
-            print(add_batch_to_playlist(playlist_id,uris))
-            add_dd_opening_track()
+            print(add_to_playlist(playlist_id,uris))
+            add_dd_opening_track() #hidden print
             add_podcasts_to_playlist(playlist_id)
             print('Finished Building New Daily Drive With Custom Playlist[Shuffle]')
     return 'Daily Drive Built'
@@ -706,24 +773,30 @@ def get_all_user_owned_playlists(): #how to get all only my playlists
     total_playlists = json_result['total'] #get total of playlists I have
     #offset = json_result['offset'] #current offset of playlists, this ups automatically until the end
     playlist_count = 0 #count how many playlists are mine
-    tempdict = {}
+    tempdict = {} #doesn't work dont use
     templist=[]
+    
     
     while offset < total_playlists: #when offset reaches max number of playlist stops
  
+        #original url
         url = f"https://api.spotify.com/v1/users/{uid}/playlists?limit=50&offset={offset}"
+        
         result = requests.get(url, headers=headers)
         json_result = json.loads(result.content)
         
         username=session.get('displayname')
+        
+        # for debugging purposes
+        # if offset>100:
+        #     break
         
         for index, items in enumerate(json_result['items']): #iterate through this page of playlists
             if(json_result['items'][index]['owner']['display_name']==username): #if the playlists are mine... add them to the json (or in this case, the list of available playlists to choose from)  NOTE: for spotify featured playlists and not my own, I can simply do playlists that aren't mine w/ !, or get rid of if altogether for all resuls (there's 1290 though)
                 id = json_result['items'][index]['id']
                 #result=add_playlist_to_list(id) #***** HOW TO BULK ADD??
                 
-                print("playlist count update:")
-                print(playlist_count)
+                
                 
                 #print(authtoken.get_current_user_db_info().username)
                 playlist_count=playlist_count+1
@@ -746,10 +819,10 @@ def get_all_user_owned_playlists(): #how to get all only my playlists
                 }
                 
                 
-                print(data)
-                tempdict.update(data)
+                #print(data)
+                #tempdict.update(data) #doesn't work
                 templist.append(data)
-            
+                
                 if result == False:
                     print('error getting user owned playlists')
                     break
@@ -770,16 +843,24 @@ def get_all_user_owned_playlists(): #how to get all only my playlists
     print(playlist_count)
     print()
     #return json_result
-    #print(templist)
+    print("templist")
+    #print(tempdict)
+    #tempdict=dict(templist) #convert list to dict #tempdict=dict({}"playlists":templist}) 
+    json_object = json.dumps(templist,  indent = 4) 
+    tempdict=json.loads(json_object)
     uid = session.get('user')
-    result=mongo.db.playlists.insert_many(
+    result=mongo.db.playlists.update_many( #ERROR: documents cannot be non empty list
         { '_id': uid }, #specify the document
-        { '$addToSet': { 'playlists': templist } } # must be array. addtoset only adds if it doesnt already exist in array! useful for playlist@
+        { '$set': { 'playlists': templist } }#, # must be array. addtoset only adds if it doesnt already exist in array! useful for playlist@
+        #upsert=True #if True, then if there is no document with the uid it will simply create and insert_one.
     )
+    
+    #result=mongo.db.playlists.insert_many(json_object) #?
     #look into: TypeError: documents must be a non-empty list
     if "'updatedExisting': True" in str(result):
         #print("true")
-        return f'{playlist_count} playlists added'
+        print(f'{playlist_count} playlists added')
+        return f'{playlist_count}'
         #return True
         
     return playlist_count

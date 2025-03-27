@@ -10,7 +10,7 @@ function RA(){
     url += "&response_type=code";
     //url += "&show_dialog=true"; //force user to login again?
     //url += "&state=xyz" //i should add some adqeuate code here
-    url += "&scope=playlist-read-private playlist-modify-public playlist-modify-private ugc-image-upload user-read-private";
+    url += "&scope=playlist-read-private playlist-modify-public playlist-modify-private ugc-image-upload user-read-private playlist-read-private";
     url += "&redirect_uri=" + redirect_uri;
     window.location.href = url; //show spotify's auth screen
 }

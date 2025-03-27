@@ -13,11 +13,14 @@
     <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='spinner.css')}}">
 
+    <!-- favicon -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='spotifylogo.png') }}">
+
     <!-- Bulma Navbar -->
     <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
         <a class="navbar-item p-0 pl-3" width="64" href="{{ url_for('index') }}">
-          <img class="is-64x64" src="https://cdn.freebiesupply.com/logos/large/2x/spotify-2-logo-png-transparent.png" alt="spotify logo">
+          <img class="is-64x64" src="{{ url_for('static', filename='spotifylogo.png') }}" alt="spotify logo">
         </a>
     
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">

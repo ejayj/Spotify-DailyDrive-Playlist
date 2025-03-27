@@ -62,7 +62,7 @@ def get_token():
     }
     data = {"code": code,
             "redirect_uri": "http://127.0.0.1:5000/",
-            "grant_type": "authorization_code" } #was client_credentials
+            "grant_type": "authorization_code"} #was client_credentials
     result = post(url, data=data, headers=headers)
     json_result = json.loads(result.content)
     try:
@@ -72,17 +72,17 @@ def get_token():
     except:
         #print("no refresh token")
         pass
-    #print("token:")
-    #print(json_result)
-    #print("code:")
-    #print(code)
-    #print("json result")
+    # print("token:")
+    # print(json_result)
+    # print("code:")
+    # print(code)
+    # print("json result")
     token = checktoken(json_result) #this converts the result into an access_token or refresh_token via parse if successful
     session['token']=token #save access token
-    #print("token test")
-    #print(token)
-    #print("token to be passed:")
-    #print(token)
+    # print("token test")
+    # print(token)
+    # print("token to be passed:")
+    # print(token)
     return token
     
 def get_auth_header(token):
@@ -104,7 +104,7 @@ def checktoken(json_result): #makes sure we recieved a token from spotify respon
         #else:
             #print("no error")
     except:
-        #print("no error2")
+        print("no error2 get authtoken refreshed.. what si the expiration?")
         
         #the above try is an error, token is successful, save refresh token
         #session['refreshtoken']=json_result['refresh_token'] #save refresh token
@@ -169,9 +169,13 @@ def request_refreshed_access_token(): #if this doesn't work then I know I'll nee
             "refresh_token": refresh_token}
     result = post(url, headers=headers, data=data)
     json_result = json.loads(result.content)
-    #print(json_result)
+    # print("refresh token results:")
+    # print(json_result)
     try:
         token = json_result['access_token']
+        session['tokentimeout']=[json_result['expires_in'],datetime.now().strftime("%X")] #does this work?
+        session["rtoken"]=token
+        #print(session.get('tokentimeout'))
     except:
         print("error")
         print(json_result) #im probably reaching this error because they need to retrieve this data from the databse
@@ -214,7 +218,8 @@ def get_token_firsttime(code):
     }
     data = {"code": code,
             "redirect_uri": "http://127.0.0.1:5000/",
-            "grant_type": "authorization_code" } #was client_credentials
+            "grant_type": "authorization_code",
+            "scope": "playlist-read-private playlist-modify-public playlist-modify-private ugc-image-upload user-read-private playlist-read-private"} #was client_credentials
     result = post(url, data=data, headers=headers)
     json_result = json.loads(result.content)
     try:
@@ -230,7 +235,8 @@ def get_token_firsttime(code):
     #print(code)
     #print("json result")
     token = checktoken(json_result) #this converts the result into an access_token or refresh_token via parse if successful
-    session['token']=token #save access token
+    session['token']=token #save access token #should be saved as refresh taken
+    
     #print("token test")
     #print(token)
     #print("token to be passed:")
