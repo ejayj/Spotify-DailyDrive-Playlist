@@ -1,0 +1,11 @@
+Issues I ran into with deploymnet:
+1 - Pip has to be upgraded to the latest version
+2 - Python has to be upgraded to the latest version
+3 - I may have to use '&&' commands for specific requirments that won't install, in order to get the build working
+4 - known pip install errors with deprecated pip and python versions (mainly python) are: dnspython, flask, and flask-sql alchemy 
+
+Deployment is live, currently hoested on render. url:
+https://pythonspotifyapi.onrender.com
+
+settings:
+https://dashboard.render.com/web/srv-clhv0vmg1b2c73ahndbg/deploys/dep-clhvfk6g1b2c73ahqa1g

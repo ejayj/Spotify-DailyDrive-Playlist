@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 import requests
 import authtoken
 import random
+import time
 from flask import session
 #token = authtoken.token #may need to get rid of this
 user_id = session.get('user') #this should be in authtoken, specified for each user
@@ -62,9 +63,10 @@ def get_mostrecent_podcast_uri(token, id):
     json_result = json_result["items"]
     uri = json_result[0]["uri"] #most recent podcast is at the top
     name = json_result[0]['name']
+    image = json_result[0]['images'][0]['url']
     #print("this is the name")
     #print(name)
-    return uri
+    return uri, image
 
 def get_dd_id(token):
     url = "https://api.spotify.com/v1/search"
@@ -82,12 +84,24 @@ def get_dd_id(token):
 
 
 def get_spotify_dd_opening(token, playlist_id):
-    url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks?offset=0&limit1"
+    playlist_id="37i9dQZF1EfFTETp5u0zCK"
+    daily_drive_album="1qvRrl85vhiJnPU5CVoWIE"
+    #url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks?offset=0&limit1" #THIS IS FOR PLAYLIST
+    url = f"https://api.spotify.com/v1/albums/{daily_drive_album}/tracks?offset=0&limit1" #THIS IS FOR ALBUMS; #offset is 1, but how can i change this for different days of the week? 
+    #track 5 is a good transition from music, back to the news
     headers = authtoken.get_auth_header(token)
     result = requests.get(url, headers=headers)
     json_result = json.loads(result.content)
+    if "error" in json_result:
+        print("error")
+        #print(playlist_id)
+        print(json_result)
+        return "error" #default uri: 6S1kSZwTOv93ZmClI5tekm?si=9eab464054c841dd or return "error"
     json_result = json_result["items"]
-    uri = json_result[0]["track"]["uri"]
+    #print(json_result)
+    #uri = json_result[0]["track"]["uri"] #for playlist
+    uri = json_result[0]["uri"]#["track]["uri"] previously
+    print("success")
     return uri
 
 def get_playlist_tracks_limit(token, playlist_id,limit):
@@ -97,12 +111,15 @@ def get_playlist_tracks_limit(token, playlist_id,limit):
     json_result = json.loads(result.content)
     json_result = json_result["items"]
     uri = json_result#[0]["track"]#["uri"]
+    print(uri)
     return uri
 
 def get_playlist_tracks(token, playlist_id):
-    print('Retrieving Playlist Tracks ...')
+    token=authtoken.get_token()
+    
     url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks?fields=items(track(name,type,uri))"# retruns name, type and uri #?offset=0&limit=" #unfinished, needs max - completed in next line
-    headers = authtoken.get_auth_header(token)
+    #headers = authtoken.get_auth_header(token)
+    headers = {"Authorization": "Bearer " + token}
     result = requests.get(url, headers=headers)
     json_result = json.loads(result.content)
     #print(json_result)
@@ -112,11 +129,11 @@ def get_playlist_tracks(token, playlist_id):
 
 def get_playlist_tracks_shuffle(token, playlist_id): #to be integrated with with the compile_uris_shuffling for large number of tracks
     print('Retrieving Playlist Tracks ...')
-    
     url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"#?fields=items(track(name,type,uri))"# retruns name, type and uri #?offset=0&limit=" #unfinished, needs max - completed in next line
+    #headers = {"Authorization": "Bearer " + token}
+    #result = requests.get(url, headers=headers)
     headers = authtoken.get_auth_header(authtoken.get_token())
     offset = 0 #offset=350 for a test
-
     result = requests.get(url, headers=headers)
     json_result = json.loads(result.content)
     total_playlist_items = json_result['total']
@@ -136,8 +153,7 @@ def get_playlist_tracks_shuffle(token, playlist_id): #to be integrated with with
                 pass
         
         offset=offset+50
-            
-    
+
     #print(json_result["items"][3]["track"]["name"])
     #file=open('newnewnew.json','w+')
     #json_data=json.load(file)
@@ -147,8 +163,6 @@ def get_playlist_tracks_shuffle(token, playlist_id): #to be integrated with with
     #print(json_result)
     #json_result = json_result['items']
     #uri = json_result#[0]["track"]#["uri"]
-    
-    
     result_list = uris.split(',') #splits raw uris into an organized list, uris alone is mess of a single text dock
     result_list.pop(len(result_list)-1) #get rid of end list null element
     #print(result_list)
@@ -171,6 +185,10 @@ def shuffle_compile_uris_2(uris_list): #takes in a json file of a list from the 
         #print(uris_list[random_track_indices[x]])
         uris = uris + f'{uris_list[random_track_indices[x]]},' #get random song
     #print(maxrange) to test max range (should be 1- however many tracks there are because the track indecies start at 0)
+    # time.sleep(5)
+    # print('final track uris:')
+    # print(uris)
+    # time.sleep(5)
     return uris
 
 def shuffle_compile_playlists_tracks(playlist_selection_id): #this is the main function that joins the two shuffling playlist functiosn together (for bigger playlists), see the snapshot save for the original copy of th functions (Still saved)
@@ -196,7 +214,7 @@ def get_daily_drive_tracks_uris(token):
 def get_all_podcast_info(token, name): #we want id, uri, and name
     set_token(token)
     podcast_name, podcast_id=get_podcast_id(token,name) #searches id via name
-    podcast_uri=get_mostrecent_podcast_uri(token,podcast_id) #searches latest episode via uri
+    podcast_uri, podcast_image=get_mostrecent_podcast_uri(token,podcast_id) #searches latest episode via uri
 
     #the below is really extra!
     #podcast_name=get_podcast_show_title(token,podcast_id) #returns actual name via id used to get the episode uri
@@ -204,7 +222,8 @@ def get_all_podcast_info(token, name): #we want id, uri, and name
     data = {
             "name": f"{podcast_name}",
             "id": f"{podcast_id}",
-            "uri": f"{podcast_uri}"
+            "uri": f"{podcast_uri}",
+            "image": f"{podcast_image}"
         }
     #podcast_info = [podcast_name,podcast_id,podcast_uri] #this is our python list of all podcast info we need for json files
     return data#podcast_info
@@ -249,12 +268,33 @@ def get_podcast_show_title_from_episode_id(token, id):
 #        uris = uris+f'{uri},'
         #print(uris)
         
+def get_playlist_info_new(playlist_id):  #test with 2FRLYxNARiIsJpajtLtzIp - #it will print the emoji of the playust name, but i cannot reverse search that emoji - even in the spotify app you cant search emojis, no use doing it here
+    token=session.get('accesstoken')
+    url = f"https://api.spotify.com/v1/playlists/{playlist_id}"
+    headers = {"Authorization": "Bearer " + token}#, "Content-Type": "application/json"} #or token
+    result = requests.get(url,headers=headers)
+    json_result = json.loads(result.content)#['name']
+    
+    url = f"https://api.spotify.com/v1/playlists/{playlist_id}/images"
+    result = requests.get(url,headers=headers)
+    image_json_result= json.loads(result.content)#['name']
+    
+    json_data = {
+        "playlist": json_result,
+        "playlist_image": image_json_result
+    }
+    return json_data
+
 def get_playlist_info(playlist_id):  #test with 2FRLYxNARiIsJpajtLtzIp - #it will print the emoji of the playust name, but i cannot reverse search that emoji - even in the spotify app you cant search emojis, no use doing it here
     token=session.get('accesstoken')
     url = f"https://api.spotify.com/v1/playlists/{playlist_id}"
     headers = {"Authorization": "Bearer " + token}#, "Content-Type": "application/json"} #or token
     result = requests.get(url,headers=headers)
     json_result = json.loads(result.content)#['name']
+    
+    url = f"https://api.spotify.com/v1/playlists/{playlist_id}/images"
+    #result = requests.get(url,headers=headers)
+    new_json_result=json_result = json.loads(result.content)#['name']
     return json_result
 
 #*********** Above are Support Function Calls ***************#
@@ -262,7 +302,7 @@ def get_playlist_info(playlist_id):  #test with 2FRLYxNARiIsJpajtLtzIp - #it wil
 
 def get_latest_podcast(token, podcast_name): #gets the latest podcast of your choice
     podcast_id=get_podcast_id(token, podcast_name)
-    uri = get_mostrecent_podcast_uri(token, podcast_id)
+    uri, image = get_mostrecent_podcast_uri(token, podcast_id)
     return uri
 
 def get_podcast_show_title(token,podcast_id):

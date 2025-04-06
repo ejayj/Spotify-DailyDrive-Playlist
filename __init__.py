@@ -7,6 +7,7 @@ from flask_session import Session
 from datetime import timedelta
 from db import db, mongo
 
+
 mongo_client=""
 def create_app():
     global mongo_client
@@ -61,47 +62,95 @@ def index():
     data = json.load(open(json_url)) #change data to mongodb stuff when possible
     token = request.args.get('code')
     
-    data = list(mongo.db.playlists.find({ "_id" : "Default" })) #or playlist id or name ( i can make my own search function)
-    data=data[0]["playlists"]
-    maxindex=len(data)-1
+    # data = list(mongo.db.playlists.find({ "_id" : "Default" })) #or playlist id or name ( i can make my own search function)
+    # #maybe make checkuign the playlists into data it's own method?
+    # try:
+    #     data=data[0]["playlists"]
+    #     maxindex=len(data)-1
+    # except:
+    #     print("error with Data, line 67") #we are going to get this error if someon eis not logged in, so im commenting out this section
+    #     pass
+    # maxindex=len(data)-1
     
+    #how to remove authtoken header from url??
     if token == None and not "user" in session: #or if user not already logged in
         print("index 1 USER NOT IN SESSION")
-        return render_template('authorize.html', data=data, maxindex=maxindex)
+        #we have no data so we wont have a data or max index to send
+        return render_template('authorize.html', data=None, maxindex=0)
     elif token and not "user" in session: #if user is not logged in/has auth code in header
         print("index 2 USER NOT IN SESSION")
         info = main.get_userinfo(token) #saves user if not in database, updates their info if they are
         session.permanent = True
         session["user"]=info["uid"] #...log them in
+        session["displayname"]=info["name"]
         print("user now in session:")
         print(session.get('user'))
-        main.set_uid(session.get('user'))
-        data=list(mongo.db.playlists.find({ "_id" : info["uid"] })) 
-        #data=data[0]["playlists"] #we cant check to see if we have all of their playlists, if it returns and error of 0 for getingt their playlists
-        main.get_user_playlists()
+        print(session.get('displayname'))
+        #main.set_uid(session.get('user')) #THIS IS IMPORTANT*** -it gets all of the user's playlists. This is commented out to save the amount of API requests we make to spotify :)
+        #data=list(mongo.db.playlists.find({ "_id" : info["uid"] })) 
         
-        #if len(data) == mongo.db.user.find({ "_id" : info["uid"] })[0]['playlists_amount']: #if the length of data in db equals the playlist number we have on file for them, skip this  step
-        #    main.get_user_playlists()
-        #im going to want a loading div for while this happens as it gets all the user owned playlists
-        
-
-        print("we reach here")
+        #get user playlists 
+        main.get_user_playlists(session.get('user'))
         data = list(mongo.db.playlists.find({ "_id" : session.get('user') })) #or playlist id or name ( i can make my own search function)
+        
+        # if data==[]:
+        #     main.get_user_playlists(session.get("uid"))
+        #     print("wow")
+        # FIX THIS HERE!!!!
+        #data=data[0]["playlists"] #we cant check to see if we have all of their playlists, if it returns and error of 0 for getingt their playlists
+        #main.get_user_playlists(session.get('user'))
+        
+        # if len(data[0]["playlists"]) == mongo.db.user.find({ "_id" : info["uid"] })[0]['playlists_amount']: #if the length of data in db equals the playlist number we have on file for them, skip this  step
+        #     print("everything ok, but should make sure the len(data) saves correctly in the playlist_amount field for mongo db")
+        #     pass
+        
+        # if len(data[0]["playlists"]) == len(mongo.db.playlists.find({ "_id" : info["uid"] })[0]['playlists']): #if the length of data in db equals the playlist number we have on file for them, skip this  step
+        #     print("everything ok, but should make sure the len(data) saves correctly in the playlist_amount field for mongo db")
+        #     print(len(mongo.db.playlists.find({ "_id" : info["uid"] })[0]['playlists']))
+        #     pass   
+
+        
+        
+        
+        if len(data[0]["playlists"]) == mongo.db.user.find({ "_id" : info["uid"] })[0]['playlists_amount']: #if the length of data in db equals the playlist number we have on file for them, skip this  step
+            print("everything ok, but should make sure the len(data) saves correctly in the playlist_amount field for mongo db")
+        #so len(data) and the amount of playlists from mongodb should be the same since data=mongodb. why is  this not the case?
+        #additioanlly, we should get the total number of USER owned playlists from SPOTIFY and compare the number. if it is greater or less than, we need to make the adjustments.
+        elif len(data[0]["playlists"]) <=1:
+            print("user has 1 or less playlists, getting user")
+            main.get_user_playlists(session.get('user'))
+            #im going to want a loading div for while this happens as it gets all the user owned playlists
+        elif len(data) == 0: #meaning it results in an error? means there is no user right? need to get info
+            print("some sort of error in line 101 with retriving dats. need to get user info?:")
+            print(len(data[0]["playlists"]))
+            print(mongo.db.user.find({ "_id" : info["uid"] })[0]['playlists_amount'])
+        #print("we reach here")
+        
+        # print("printing data")
+        # print(data)
         data=data[0]["playlists"]
         maxindex=len(data)-1
-        print("printing")
-        print(data)
+
+        
+        #print("printing")
+        #print(data)
         return render_template('index.html', data=data, maxindex=maxindex)
     elif "user" in session: #if you're already logged in
         print("we reach here")
         data = list(mongo.db.playlists.find({ "_id" : session.get('user') })) #or playlist id or name ( i can make my own search function)
         data=data[0]["playlists"]
         maxindex=len(data)-1
-        print("printing")
-        print(data)
+        #print("printing")
+        #print(data)
         print("3 user already logged in. user:")
         print(session.get('user'))
         session["user"]=session.get('user')
+        # print("deleting user:")
+        # print(session.get('user'))
+        # deleteuser()
+        
+        #update playlists? how to do this with massive amounts of data. remove deleted playlists and add new ones (maybe do it by date, last playlist added date on our side vs the newest playlist on spotify side? run this in background?)
+        
         return render_template('index.html', data=data, maxindex=maxindex)
 
 @app.route("/createplaylist", methods=["POST", "GET"])
@@ -110,7 +159,7 @@ def createplaylist():
     print(session.get('user'))
     
     data = list(mongo.db.playlists.find({ "_id" : session.get('user') })) #or playlist id or name ( i can make my own search function)
-    data=data[0]["playlists"]
+    data=data[0]["playlists"] #this will show up as an error if you need to log in agaiin. iu need to make this it's own method and do try-catch statements for logging in
         
     #im going to need to split these two up into two different statments
     if not "user" in session: #make this into a "check if logged in ()" function
@@ -121,7 +170,7 @@ def createplaylist():
     try:
         id = request.form["id"] #should this be playlsitname as per line 20 of index.html?
         playlistname=request.form["playlistname"]
-        session["id"]=id
+        session["id"]=id #id of music playlist we want
         return render_template('createplaylist.html', id=id, playlistname=playlistname, data=data) #if it reaches here, it is the first page load
     except:
         pass
@@ -147,7 +196,7 @@ def createplaylist():
 
 @app.route("/playlist") #i could even make a pop up saying its been created, and a green spotify go button to go to playlist
 def playlist():
-    url=main.run_playlist_script(session.get('id'))
+    url=main.run_playlist_script(session.get('id')) #passes id of music playlist we want 
     return redirect(url)
 
 @app.route("/404") #figure out how to pass error message! request.args? sessions?
@@ -174,16 +223,73 @@ def login():
     
 @app.route("/logout")
 def logout():
+    #FOR DEBUG PURPOSES ONLY!!!
+    #print(main.delete_user(session.get('user'))) #THIS FULLY DELETES USER!!
     session.pop("user", None)
     return redirect(url_for('index'))
 
-@app.route("/podcasts", methods=["POST", "GET"])
+@app.route("/podcasts", methods=["POST", "GET"]) #add podcasts page
 def podcasts():
+    #<a href="{{ url_for('{{ urlarray[i]  }} ') }}"> {{podcasts[i]["name"] }} </a>
+    #want to implementth is above, upon click open episode in new window
     message=""
-    if request.method == "POST":
-        submission = request.form["submission"]
-        message=main.add_podcast_to_list(submission)
-    return render_template('podcasts.html', message=message)
+    data = list(mongo.db.playlists.find({ "_id" : session.get('user') })) #or playlist id or name ( i can make my own search function)
+    podcasts=data[0]["podcasts"]
+    maxindex=len(podcasts)
+    # try:
+    #     podcasts=data[0]["podcasts"]
+    #     maxindex=len(podcasts)
+    # except:
+    #     pass
+    
+    
+    urlarray=[]
+
+    for podcast in podcasts:
+        id = podcast["uri"].split(':')
+        id=id[2]
+        #print(id)
+        url=f"https://open.spotify.com/episode/{id}"
+        urlarray.append(url)
+        #print(url)
+        #we should make an erro rmessage - podcast already added!
+
+    if request.method == "POST": #find a way to automatically load changes but also display message?
+        try:
+            if request.form["submission"]: #this should be a more efficient search, should display your saved/followed podcasts, and also allowm for a paste of a url 
+                submission = request.form["submission"]
+                message=main.add_podcast_to_list(submission)
+
+        except:
+            if request.form["podname"]:
+                pod = request.form["podname"]
+                podid= request.form["podid"]
+                message=f"deleted: {pod}" #this should probably be an alert asking if you're sure you want to delete podname
+                result = mongo.db.playlists.update_one({"_id": session.get('user')}, { '$pull': {"podcasts": { "id" : podid}} } )
+                print("deleting")
+                print(result)
+                
+        #reload data based on changes above
+ 
+        data = list(mongo.db.playlists.find({ "_id" : session.get('user') })) #or playlist id or name ( i can make my own search function)
+        podcasts=data[0]["podcasts"]
+        maxindex=len(podcasts) #i had to set this without -5 because it wouldn't show the last podcast :()
+        urlarray=[]
+        
+        for podcast in podcasts:
+            id = podcast["uri"].split(':')
+            id=id[2]
+            #print(id)
+            url=f"https://open.spotify.com/episode/{id}"
+            urlarray.append(url)
+    
+    #todo next: allow a reshuffle of which order the playlists are in!
+    return render_template('podcasts.html', message=message, podcasts=podcasts, maxindex=maxindex, urlarray=urlarray)
+
+@app.route("/deleteuser", methods=["POST", "GET"])
+def deleteuser():
+    print(main.delete_user(session.get('user'))) #fionakennedyyep
+    return None
 
 @app.route("/test", methods=["POST", "GET"])
 def test():
@@ -244,9 +350,13 @@ def test():
     return render_template('test.html')
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=80)
+    app.run(debug=True, host="0.0.0.0", port=5000) #80
 
+# main.delete_user("31dck52ytkqtrzfat2rb6ox5z72y")
 
+#flask sql database testing
+#users = User.query.all()
+#print(users)
 #print(main.add_podcast_to_list("Radio Headspace"))
 
 #display podcasts you already have
@@ -261,7 +371,7 @@ if __name__ == "__main__":
 #main.delete_user("31dck52ytkqtrzfat2rb6ox5z72y")
 #print(mongo.db.playlists.find_one())
 
-#user = User.query.filter_by(username="poop").first()
+#                                               user = User.query.filter_by(username="poop").first()
 #print(user)
 #db.session.delete(user)
 #db.session.commit()
@@ -327,3 +437,35 @@ if __name__ == "__main__":
 
 
 #get permission from spotify to monetize or advertize app?
+
+
+
+
+
+#****************************************
+#****************************************
+#****************************************
+#****************************************
+#THINGS TODO 
+#****************************************
+#****************************************
+#****************************************
+#****************************************
+
+# 1) When someone logs in, show their profile icon from spotify, with a drop down for a log out button
+# 2) display only a few playlists at a time with the search bar? Have a show all button to reveal every playlist they have (makes page super long)
+# 3) copy playlist image for playlist listed, (not logged in mongodb, can i even retrieve playlist photo?)
+#   -also do the same for podcast, maybe even list it's info/last episode under in a square-like setting
+
+#re-format spotify project look unless fiona wants to help
+
+#allow the reordering of podcasts
+
+# 4) create auto-update feature for playlists (For when program auto-runs on app) => make mobile app version
+# 5) fix daily drive playlist reader, maybe randomize which welcomes get used and place another "next up is news" update after music section ends
+# maybe make the playlist recursive like in sections:
+# -> intro track, block 1, block 2, etc. etc. => each block starts with a podcast, and 4 random songs, and ends with that outro track. repeat until no more podcast?
+
+
+#ideas:
+#what if someone doesn't want to just add their own playlist? what if they want to add another outside playlist? separate array for those playlists and a separate page to o so?

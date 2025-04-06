@@ -10,7 +10,7 @@ import requests
 from flask_sqlalchemy import SQLAlchemy
 from flask import session
 from flask_session import Session
-from __init__ import app
+# from __init__ import app
 #from . import db
 from db import db, mongo
 from models import User
@@ -18,8 +18,12 @@ from datetime import datetime
 
 load_dotenv()
 
-client_id = os.getenv("CLIENT_ID")
-client_secret = os.getenv("CLIENT_SECRET")
+#put this in .env file ventually
+#client_id = os.getenv("CLIENT_ID")
+#client_secret = os.getenv("CLIENT_SECRET")
+
+client_id="1f69a9d216f6424f92fb177324f1e06c"
+client_secret="6049a8ed4fc9431b92cd0476b6ba039a"
 #get this after getting user data
 code = ""
 refresh_token = "" #set this to database value
@@ -47,7 +51,7 @@ def get_token():
         print("how did we end up here? No user in session, yet we're getting an auth code.")
         exit(0)
         
-    auth_string = client_id + ":" + client_secret
+    auth_string = f"{client_id}:{client_secret}"
     auth_bytes = auth_string.encode("utf-8")
     auth_base64 = str(base64.b64encode(auth_bytes), "utf-8")
     
@@ -57,8 +61,8 @@ def get_token():
         "Content-Type": "application/x-www-form-urlencoded"
     }
     data = {"code": code,
-            "redirect_uri": "http://127.0.0.1:80/",
-            "grant_type": "authorization_code" } #was client_credentials
+            "redirect_uri": "http://127.0.0.1:5000/",
+            "grant_type": "authorization_code"} #was client_credentials
     result = post(url, data=data, headers=headers)
     json_result = json.loads(result.content)
     try:
@@ -68,17 +72,17 @@ def get_token():
     except:
         #print("no refresh token")
         pass
-    #print("token:")
-    #print(json_result)
-    #print("code:")
-    #print(code)
-    #print("json result")
+    # print("token:")
+    # print(json_result)
+    # print("code:")
+    # print(code)
+    # print("json result")
     token = checktoken(json_result) #this converts the result into an access_token or refresh_token via parse if successful
     session['token']=token #save access token
-    #print("token test")
-    #print(token)
-    #print("token to be passed:")
-    #print(token)
+    # print("token test")
+    # print(token)
+    # print("token to be passed:")
+    # print(token)
     return token
     
 def get_auth_header(token):
@@ -100,7 +104,7 @@ def checktoken(json_result): #makes sure we recieved a token from spotify respon
         #else:
             #print("no error")
     except:
-        #print("no error2")
+        print("no error2 get authtoken refreshed.. what si the expiration?")
         
         #the above try is an error, token is successful, save refresh token
         #session['refreshtoken']=json_result['refresh_token'] #save refresh token
@@ -165,9 +169,13 @@ def request_refreshed_access_token(): #if this doesn't work then I know I'll nee
             "refresh_token": refresh_token}
     result = post(url, headers=headers, data=data)
     json_result = json.loads(result.content)
-    #print(json_result)
+    # print("refresh token results:")
+    # print(json_result)
     try:
         token = json_result['access_token']
+        session['tokentimeout']=[json_result['expires_in'],datetime.now().strftime("%X")] #does this work?
+        session["rtoken"]=token
+        #print(session.get('tokentimeout'))
     except:
         print("error")
         print(json_result) #im probably reaching this error because they need to retrieve this data from the databse
@@ -209,8 +217,9 @@ def get_token_firsttime(code):
         "Content-Type": "application/x-www-form-urlencoded"
     }
     data = {"code": code,
-            "redirect_uri": "http://127.0.0.1:80/",
-            "grant_type": "authorization_code" } #was client_credentials
+            "redirect_uri": "http://127.0.0.1:5000/",
+            "grant_type": "authorization_code",
+            "scope": "playlist-read-private playlist-modify-public playlist-modify-private ugc-image-upload user-read-private playlist-read-private"} #was client_credentials
     result = post(url, data=data, headers=headers)
     json_result = json.loads(result.content)
     try:
@@ -226,7 +235,8 @@ def get_token_firsttime(code):
     #print(code)
     #print("json result")
     token = checktoken(json_result) #this converts the result into an access_token or refresh_token via parse if successful
-    session['token']=token #save access token
+    session['token']=token #save access token #should be saved as refresh taken
+    
     #print("token test")
     #print(token)
     #print("token to be passed:")
@@ -248,11 +258,19 @@ def get_userinfo(code): #how to get only my playlists, -> NOTE: {offset} simply 
     #print(json_result)
 
     #print(json_result)
-    data= {
-        "name" : json_result["display_name"],
-        "uid" : json_result["id"],
-        "image" : json_result['images'][0]['url']
-    }
+    try:
+        data= {
+            "name" : json_result["display_name"],
+            "uid" : json_result["id"],
+            "image" : json_result['images'][0]['url']
+        }
+    except:
+        data= {
+            "name" : json_result["display_name"],
+            "uid" : json_result["id"],
+            "image" : "None"
+        }
+    
     if not User.query.filter_by(uid=data["uid"]).first(): #if they don't exist, save them
         user = User(username=data["name"], uid=data["uid"], image_file=data["image"], authcode=code, refreshtoken=refresh_token, accesstoken=session.get('accesstoken')) #this can go into get_userinfo now
         db.session.add(user)
@@ -322,7 +340,7 @@ def get_accesstokenold():
         
         uid=session.get('user')
         accesstoken = get_token()
-        print(uid)
+        #print(uid)
     else:
         get_userinfo(code) #refreshes set user id if not already set and user is logged in
     return accesstoken
@@ -451,7 +469,7 @@ def delete_user(userid):
     resultA=mongo.db.user.delete_one({"_id": userid})
     resultB=mongo.db.playlists.delete_one({"_id": userid})
     if "acknowledged=True" in str(resultA) and "acknowledged=True" in str(resultB):
-        print("Sucess")
+        print("Sucess - user deteleted")
         return True
     print("error")
     print(resultA)

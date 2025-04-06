@@ -11,12 +11,16 @@
     
     <!-- my own styles sheet -->
     <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='spinner.css')}}">
+
+    <!-- favicon -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='spotifylogo.png') }}">
 
     <!-- Bulma Navbar -->
     <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
-        <a class="navbar-item" href="{{ url_for('index') }}">
-          <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">
+        <a class="navbar-item p-0 pl-3" width="64" href="{{ url_for('index') }}">
+          <img class="is-64x64" src="{{ url_for('static', filename='spotifylogo.png') }}" alt="spotify logo">
         </a>
     
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
@@ -33,7 +37,7 @@
           </a>
     
           <a href="{{ url_for('podcasts') }}" class="navbar-item">
-            Add Podcasts Here
+            Add Podcasts
           </a>
     
           <div class="navbar-item has-dropdown is-hoverable">
@@ -48,7 +52,7 @@
               <a href="{{ url_for('test') }}" class="navbar-item">
                 Documentation(test page)
               </a>
-              <a class="navbar-item">
+              <a href="https://github.com/ejayj/PythonSpotifyAPI" class="navbar-item">
                 Contact
               </a>
               <hr class="navbar-divider">
@@ -62,7 +66,7 @@
         <div class="navbar-end">
           <div class="navbar-item">
             <div class="buttons">
-              <a href="{{ url_for('index') }}" class="button is-primary">
+              <a href="{{ url_for('index') }}" class="button is-dark" style="background-color: #1db954;">
                 <strong>Sign up</strong>
               </a>
               <a class="button is-light" href="{{ url_for('logout') }}" onclick="{{ url_for('logout') }}">

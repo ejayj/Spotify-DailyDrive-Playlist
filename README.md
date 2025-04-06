@@ -1,2 +1,94 @@
 # PythonSpotifyAPI
 Creates a custom 'my daily drive' spotify playlist with your choice of music and podcasts
+#info
+#use source ./venv/bin/activate to activate the venv; source .venv/bin/activate
+#can also do flask run app.py
+#to run python -m flask run **Main method
+#or python3 app.py
+#or use $ flask --app hello run --debug
+
+
+#use deactivate to exit venv
+#create venv using vscode command pallet
+#see which version using python3 --version
+#use pip install requirements to get set up,
+
+#project requires pythong 3.10
+
+
+
+TODO: 
+==========
+Next time I have an issue, lets see what actual url request is getting sent over to spotify so i can zero in on the issue.
+
+********
+add feature when you search up a podcast, it qautomatially pops up with possible matches for you to click on
+
+>playlist imagesand podcast images?
+MAIN THINGS TO DO BEFORE PRODUCTION:
+FIXES:
+- if playlist amount is <10 (or 28 I think is the required number); fill rest w/ spotify reccomendation songs
+- if ERROR PODCASTS UPDATING => time.skeep(30 secs) then retry, repeat only 2 more times before saying (error try again- podcasts updating) =>OR go to eventually=> let user know podcast will be ready in 5 mins
+- if user has less than 3-5 podcasts, add your own? add mental health podcast if user doesnt?
+- if user has mental health podcast, place that right after podcast number 1
+- allow user to shift which podcast goes first on playlist (drag and drop)
+
+if user does not have my setup=> add a podcast after 
+
+
+MAIN THINGS TO DO EVENTUALLY:
+- setup auto-update for podcasts while server runs
+
+retrieving playlist tracks can take a while
+maybe it's better to retrieve a random song and add it to the playlist one at a time, for each podcast there is. that way, if there is an error, we can isolate it and retry with a new random song or podcast
+
+also if playlist length is not adequate, we should go to the radio for said playlist or just take from liked songs or spotify's reccomndation playlist/drive
+
+todo: once the session.get token expires, run auth.get token again (it will automatically update session(token))
+:session.get('tokentimeout')
+
+if ERROR PODCASTS UPDATING
+time.skeep(3600)
+
+Current Problem: I get "{'error': {'status': 400, 'message': 'Invalid base62 id'}}" -> is it the token?
+First idea: Fix how tokens work. currently I have saved the expires_in token in the session in a tuple. I need to find a way to save the current time and place it in the "time_here?" portion of the tuple. check this out, every time i need to use the token. If the time out = the seconds passed since the expired timeout, then I can fetch new request token....
+
+Second Idea: check the url to see if its good
+try pyton 3.10 as a new method to fix these errors
+
+do a get my playlist button
+favicon not working?
+
+change all the ip address from 127.0.0.1:80 or 5000 to something else
+add todo list to here from all around code?
+
+Also: try to fix the "AttributeError: attribute '__default__' of 'typing.ParamSpec' objects is not writable"
+or try going from scratch since there' sso many issues to solve....
+
+
+i needd .flaskenv to say 
+FLASK_APP=__init__.py
+
+dont forget to start mongo db
+
+
+
+mongodb:
+install homebrew
+install mongodb via homebrew
+brew services start mongodb-community@8.0 [or stop, can also take out @8.0]
+
+
+to check if mongodb is working: brew services list
+
+use: mongosh
+> to start using mongodb
+use mongo compass app for a gui of the data base
+or use: brew services stop mongodb-community@8.0
+
+next: 
+add the redirect URI to the JavaScript code and make sure it is in line with the allowed redirect UR as on Spotify
+change the redirect uri everywhere it shows up: so far: authtoken.py, and script.js
+
+
+If i want another user to use my app, i have to approve them
