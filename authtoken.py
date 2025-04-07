@@ -19,11 +19,10 @@ from datetime import datetime
 load_dotenv()
 
 #put this in .env file ventually
-#client_id = os.getenv("CLIENT_ID")
-#client_secret = os.getenv("CLIENT_SECRET")
+client_id = os.getenv("CLIENT_ID")
+client_secret = os.getenv("CLIENT_SECRET") #SEE IF THIS WORKS?
+redirect_uri= os.getenv("redirect_uri")
 
-client_id="1f69a9d216f6424f92fb177324f1e06c"
-client_secret="6049a8ed4fc9431b92cd0476b6ba039a"
 #get this after getting user data
 code = ""
 refresh_token = "" #set this to database value
@@ -61,7 +60,7 @@ def get_token():
         "Content-Type": "application/x-www-form-urlencoded"
     }
     data = {"code": code,
-            "redirect_uri": "http://127.0.0.1:5000/",
+            "redirect_uri": redirect_uri,
             "grant_type": "authorization_code"} #was client_credentials
     result = post(url, data=data, headers=headers)
     json_result = json.loads(result.content)
@@ -217,7 +216,7 @@ def get_token_firsttime(code):
         "Content-Type": "application/x-www-form-urlencoded"
     }
     data = {"code": code,
-            "redirect_uri": "http://127.0.0.1:5000/",
+            "redirect_uri": redirect_uri,
             "grant_type": "authorization_code",
             "scope": "playlist-read-private playlist-modify-public playlist-modify-private ugc-image-upload user-read-private playlist-read-private"} #was client_credentials
     result = post(url, data=data, headers=headers)

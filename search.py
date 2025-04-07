@@ -5,6 +5,13 @@ import authtoken
 import random
 import time
 from flask import session
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+dd_playlist_id= os.getenv("dd_playlist_id")
+daily_drive_album_id= os.getenv("daily_drive_album_id")
+
 #token = authtoken.token #may need to get rid of this
 user_id = session.get('user') #this should be in authtoken, specified for each user
 token = session.get('accesstoken')
@@ -84,8 +91,8 @@ def get_dd_id(token):
 
 
 def get_spotify_dd_opening(token, playlist_id):
-    playlist_id="37i9dQZF1EfFTETp5u0zCK"
-    daily_drive_album="1qvRrl85vhiJnPU5CVoWIE"
+    playlist_id=dd_playlist_id
+    daily_drive_album=daily_drive_album_id
     #url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks?offset=0&limit1" #THIS IS FOR PLAYLIST
     url = f"https://api.spotify.com/v1/albums/{daily_drive_album}/tracks?offset=0&limit1" #THIS IS FOR ALBUMS; #offset is 1, but how can i change this for different days of the week? 
     #track 5 is a good transition from music, back to the news
