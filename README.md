@@ -92,3 +92,9 @@ change the redirect uri everywhere it shows up: so far: authtoken.py, and script
 
 
 If i want another user to use my app, i have to approve them
+
+
+
+=====
+another idea:
+allow user to input what track position they want their playlist ("e.g. ABC New: position 2 (after intro track); can[t be 2])

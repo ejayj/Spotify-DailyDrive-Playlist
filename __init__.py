@@ -1,5 +1,6 @@
 import os
 from os import path
+from dotenv import load_dotenv
 from urllib import response
 from flask import Flask, g, redirect, render_template, request, jsonify, json, url_for, session
 from flask_sqlalchemy import SQLAlchemy
@@ -7,17 +8,19 @@ from flask_session import Session
 from datetime import timedelta
 from db import db, mongo
 
+load_dotenv()
+sessiontype= os.getenv("SESSION_TYPE")
 
 mongo_client=""
 def create_app():
     global mongo_client
     app = Flask(__name__)
     
-    app.secret_key = "SECRET KEY" # change later
+    app.secret_key = os.getenv("SECRET_KEY")  # change later
     app.permanent_session_lifetime = timedelta(minutes=5) #how long you stay logged in automatically
     app.config["SESSION_TYPE"] = "filesystem"
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///application.db'
-    app.config["SECRET_KEY"] = 'YourSecretKey@123'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("SQLALCHEMY_DATABASE_URI")
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
     
     app.app_context().push()
     app.test_request_context().push()
@@ -30,7 +33,7 @@ app = create_app()
 
 from models import User
 db.create_all()
-SESSION_TYPE = 'redis'
+SESSION_TYPE = sessiontype
 Session(app)
 playlist = ""
 session["refreshtoken"]=""
