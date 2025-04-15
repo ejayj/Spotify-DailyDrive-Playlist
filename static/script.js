@@ -1,20 +1,3 @@
-var CLIENT_ID="1f69a9d216f6424f92fb177324f1e06c";
-var CLIENT_SECRET="6049a8ed4fc9431b92cd0476b6ba039a";
-var code="";
-const AUTHORIZE = "https://accounts.spotify.com/authorize";
-var redirect_uri = 'http://127.0.0.1:5000/'; // example value from spotify: http://localhost:8888/callback -> this value needs to be allowed on spotify's end in dev settings
-
-function RA(){
-    let url = AUTHORIZE;
-    url += "?client_id=" + CLIENT_ID;
-    url += "&response_type=code";
-    //url += "&show_dialog=true"; //force user to login again?
-    //url += "&state=xyz" //i should add some adqeuate code here
-    url += "&scope=playlist-read-private playlist-modify-public playlist-modify-private ugc-image-upload user-read-private playlist-read-private";
-    url += "&redirect_uri=" + redirect_uri;
-    window.location.href = url; //show spotify's auth screen
-}
-
 function hi() { //hides div and shows loading div on button click
   //window.alert("hi"); //testcase
 

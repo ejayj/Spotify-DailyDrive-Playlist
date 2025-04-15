@@ -32,6 +32,7 @@ user_db = None
 mongouser=mongo.db.user
 mongoplaylist=mongo.db.playlists
 uid=""
+scope="playlist-read-private playlist-modify-public playlist-modify-private ugc-image-upload user-read-private playlist-read-private"
     
 def get_token():
     #saved_in_code=code
@@ -218,7 +219,7 @@ def get_token_firsttime(code):
     data = {"code": code,
             "redirect_uri": redirect_uri,
             "grant_type": "authorization_code",
-            "scope": "playlist-read-private playlist-modify-public playlist-modify-private ugc-image-upload user-read-private playlist-read-private"} #was client_credentials
+            "scope": scope} #was client_credentials
     result = post(url, data=data, headers=headers)
     json_result = json.loads(result.content)
     try:
@@ -474,6 +475,13 @@ def delete_user(userid):
     print(resultA)
     print(resultB)
     return None
+
+def authorize(): #authorization user url
+    response_type="code"
+    url = f"https://accounts.spotify.com/authorize?client_id={client_id}&response_type={response_type}&scope={scope}&redirect_uri={redirect_uri}"
+    #post()#?
+
+    return url
 
 #uid= get_sessionid()
 

@@ -6,6 +6,7 @@
 <!-- How do i make this non-exitable? you have to login-->
 <!-- maybe for activation, do activation.html where the modal is activate, and-->
 <!-- if ur not logged in, show modal. -->
+ <!-- Login with spotify button: onclick="RA()" replaced with href url-->
 <div id="login-modal" class="modal is-active">
     <div class="modal-background"></div>
 
@@ -17,8 +18,8 @@
             </p>
             <p class="subtitle pb-6 has-text-white" style="margin-bottom: 60px;">Login below to get started!</p>
             <!-- Your content -->
-            <button class="button is-dark is-medium is-fullwidth" style="background-color: #1db954;" onclick="RA()"
-                value="Request Authorization"><strong>Login with Spotify</strong></button>
+            <a href="{{url_for('authorize')}}"><button class="button is-dark is-medium is-fullwidth" style="background-color: #1db954;"
+                value="Request Authorization"><strong>Login with Spotify</strong></button></a>
         </div>
     </div>
     <button class="modal-close is-large" aria-label="close"></button>

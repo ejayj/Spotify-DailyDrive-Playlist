@@ -111,6 +111,9 @@ def get_userinfo(code):
 
 def set_uid(uid):
     return authtoken.set_uid(uid)
+
+def authorize():
+    return authtoken.authorize()
 #def save_userinfo(token, user): #saves this info to the database
 #    return authtoken.save_userinfo(token, user)
 
