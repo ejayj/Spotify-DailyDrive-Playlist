@@ -100,3 +100,14 @@ another idea:
 allow user to input what track position they want their playlist ("e.g. ABC New: position 2 (after intro track); can[t be 2])
 
 last security risk: placing code in browser's url
+
+#NEXT TODO:
+    #make sure the url works for new users
+    
+ #how to submit url to spotify without it showing up in the user's browser for security reasons (e.g. the client_id and reroute page url... unless it will jsut be the url of my website when live?)
+    #how to grab the token from the url, or obtain the token all together withotu the token showing up in the user's page? or how to delete token from url before user sees, and reroute them to the same home page but unlocked.
+    #is the url containing the client id dangerous? does it show in the browser url?
+     #maybe the auth url reroute page will handle al the backen data and avoid the url holding the sensitive data, since it will essentially just render the url for spotify's page.
+    #/callback? How can I receieve the code and redirect user to home page?
+    
+    #also todo: a nice new homepage that users can see/visit without needing ot unlock and through need of loggign in.
