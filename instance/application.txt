@@ -1,1 +1,0 @@
-The application.db file goes here. Hidden for security purposes.
