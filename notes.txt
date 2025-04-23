@@ -15,7 +15,7 @@ Creates a custom 'my daily drive' spotify playlist with your choice of music and
 
 #project requires pythong 3.10
 
-
+See private notesin instance.txt
 
 TODO: 
 ==========
