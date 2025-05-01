@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from datetime import timedelta
 from db import db, mongo
+#from flask_migrate import Migrate
 
 load_dotenv()
 sessiontype= os.getenv("SESSION_TYPE")
@@ -32,7 +33,7 @@ def create_app():
 app = create_app()
 
 from models import User
-db.create_all()
+#db.create_all()
 SESSION_TYPE = sessiontype
 Session(app)
 playlist = ""
@@ -40,6 +41,7 @@ session["refreshtoken"]=""
 session["accesstoken"]=""
 session["user"]=""
 session.permanent = True
+#migrate = Migrate(app, db) 
 import main
 
 #Next:
@@ -141,7 +143,14 @@ def index():
     elif "user" in session: #if you're already logged in
         print("we reach here")
         data = list(mongo.db.playlists.find({ "_id" : session.get('user') })) #or playlist id or name ( i can make my own search function)
-        data=data[0]["playlists"]
+        try:
+            data=data[0]["playlists"]
+        except:
+            print("user has no playlists, forcing login again")
+            session.pop("user", None)
+            return render_template('authorize.html', data=None, maxindex=0)
+
+            
         maxindex=len(data)-1
         #print("printing")
         #print(data)
@@ -365,9 +374,12 @@ def test():
     return render_template('test.html')
 
 if __name__ == "__main__":
+    with app.app_context():  # Needed for DB operations
+        db.create_all()      # Creates the database and tables
     app.run(debug=True, host="0.0.0.0", port=5000) #80
 
 # main.delete_user("31dck52ytkqtrzfat2rb6ox5z72y")
+
 
 #flask sql database testing
 #users = User.query.all()

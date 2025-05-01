@@ -31,7 +31,7 @@ def get_user_playlists(uid):
     update = { "$set": {f"playlists_amount" : "52"}}
     result2=mongo.db.user.find_one({ "sqlid" : 3})#mongo.db.user.update_one(query, update)
     #{ "_id" : ObjectId("4ecc05e55dd98a436ddcc47c")
-    result=mongo.db.user.update_one( #ERROR: documents cannot be non empty list
+    result=mongo.db.user.update_one( #ERROR: documents cannot be non empty list #update_one
         { '_id': uid }, #specify the document
         { '$set': { 'playlists_amount': amount } })
     #or

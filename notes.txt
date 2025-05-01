@@ -1,113 +1,83 @@
 # PythonSpotifyAPI
 Creates a custom 'my daily drive' spotify playlist with your choice of music and podcasts
-#info
-#use source ./venv/bin/activate to activate the venv; source .venv/bin/activate
-#can also do flask run app.py
-#to run python -m flask run **Main method
-#or python3 app.py
-#or use $ flask --app hello run --debug
 
+#Getting Started
+- Create Venv with At Least Python 3.10 using vscode command pallet [cmd + shift + p]
+- Use "source ./venv/bin/activate" to activate venv [Alternatively "source .venv/bin/activate"]
+- To deactivate/exit venv, use "deactivate"
+- Install dependencies using: "pip install requirements.txt -r" (may need to append python3 or python to begining)
+- Install Mongodb, and run in background
 
-#use deactivate to exit venv
-#create venv using vscode command pallet
-#see which version using python3 --version
-#use pip install requirements to get set up,
+#How To Run Application
+- Start mongodb in terminal using "brew services start/stop mongodb-community" [Alternative us mongodb-community8.0]
+- Use "python -m flask run"
+- Alternatively: Use "python3 app.py" , "flask run app.py", or "flask --app hello run --debug"
 
-#project requires pythong 3.10
+#Info
+- To run flask shell use "python -m flask shell"
+- SQL-Db can be initiallized using flask init-db, but should automatically be done with flask using db.commit_all()
+- To see which version using python3 --version
+- Project requires pythong 3.10
 
+#How to Install MongoDb (OS X)
+- install homebrew
+- install mongodb via homebrew
+- run using "brew services start mongodb-community@8.0 [or stop, can also take out @8.0]"
+- Dont forget to start MongoDb before application!
+- to check if mongodb is working: brew services list
+
+#MongoDb: Mongosh:
+- To Access mongodb, use "mongosh" in termianl
+- Alternatively, install mongodb compass for a gui of database
+
+add notes for how to srt up db, add react app
 See private notesin instance.txt
 
 TODO: 
 ==========
-Next time I have an issue, lets see what actual url request is getting sent over to spotify so i can zero in on the issue.
+#Landing Page Idea
+- have homescreen an example of how it works, linked to a generic spotify playlist; without user having to login
+- let them change podcast and songs
+- only thing- if not logged in, cant save work
 
-********
-add feature when you search up a podcast, it qautomatially pops up with possible matches for you to click on
+#Search Feature 
+- work on search feature that allows potential options that are possible matches/similar to show up in drop down menu
+- add feature when you search up a podcast, it qautomatially pops up with possible matches for you to click on
 
->playlist imagesand podcast images?
-MAIN THINGS TO DO BEFORE PRODUCTION:
-FIXES:
+#Playlist Presets
+- allow them to save build presets for each podcast/playlist
+- set up playlist images
 - if playlist amount is <10 (or 28 I think is the required number); fill rest w/ spotify reccomendation songs
-- if ERROR PODCASTS UPDATING => time.skeep(30 secs) then retry, repeat only 2 more times before saying (error try again- podcasts updating) =>OR go to eventually=> let user know podcast will be ready in 5 mins
-- if user has less than 3-5 podcasts, add your own? add mental health podcast if user doesnt?
-- if user has mental health podcast, place that right after podcast number 1
+
+#Podcast & Poisitioning Presets
+- allow user to input what track position they want their playlist ("e.g. ABC New: position 2 (after intro track); can[t be 2])
+- however it will be default to the presets I put in (2+1+4+4+4 songs inbetween. 1 is locked)
+- if user does not have my setup=> add a podcast after first one automatically?
+- if user has mental health podcast, place that right after podcast number 1 ?
+- if ERROR PODCASTS UPDATING; time.sleep(3600) or come back later message? - if ERROR PODCASTS UPDATING => time.skeep(30 secs) then retry, message repeat only 2 more times before saying (error try again- podcasts updating) =>OR go to eventually=> let user know podcast will be ready in 5 mins
+- force user to add at least 2-3 podcast? if user has less than 3-5 podcasts, add your own? add mental health podcast if user doesnt?
+
+#Notes To Self:
+
+
+
+#Major Improvements:
+- setup auto-update for podcasts while server runs
+- once the session.get token expires, run auth.get token again (it will automatically update session(token))
+:session.get('tokentimeout')
+- last security risk: placing code in browser's url; have flask redirect user to basic home screen url when code is in url (redirect twice, take in code on back end?) redirect to api backend and redirect user front end to somewhere else
+
+#Minor Fixes/Ideas
+- retrieving playlist tracks can take a while; wait wheel; maybe it's better to retrieve a random song and add it to the playlist one at a time, for each podcast there is. that way, if there is an error, we can isolate it and retry with a new random song or podcast
 - allow user to shift which podcast goes first on playlist (drag and drop)
 
-if user does not have my setup=> add a podcast after 
-
-
-MAIN THINGS TO DO EVENTUALLY:
-- setup auto-update for podcasts while server runs
-
-retrieving playlist tracks can take a while
-maybe it's better to retrieve a random song and add it to the playlist one at a time, for each podcast there is. that way, if there is an error, we can isolate it and retry with a new random song or podcast
-
-also if playlist length is not adequate, we should go to the radio for said playlist or just take from liked songs or spotify's reccomndation playlist/drive
-
-todo: once the session.get token expires, run auth.get token again (it will automatically update session(token))
-:session.get('tokentimeout')
-
-if ERROR PODCASTS UPDATING
-time.skeep(3600)
-
-Current Problem: I get "{'error': {'status': 400, 'message': 'Invalid base62 id'}}" -> is it the token?
-First idea: Fix how tokens work. currently I have saved the expires_in token in the session in a tuple. I need to find a way to save the current time and place it in the "time_here?" portion of the tuple. check this out, every time i need to use the token. If the time out = the seconds passed since the expired timeout, then I can fetch new request token....
-
-Second Idea: check the url to see if its good
-try pyton 3.10 as a new method to fix these errors
-
-do a get my playlist button
-favicon not working?
-
-change all the ip address from 127.0.0.1:80 or 5000 to something else
-add todo list to here from all around code?
-
-Also: try to fix the "AttributeError: attribute '__default__' of 'typing.ParamSpec' objects is not writable"
-or try going from scratch since there' sso many issues to solve....
-
-
-i needd .flaskenv to say 
-FLASK_APP=__init__.py
-
-dont forget to start mongo db
-
-
-
-mongodb:
-install homebrew
-install mongodb via homebrew
-brew services start mongodb-community@8.0 [or stop, can also take out @8.0]
-
-
-to check if mongodb is working: brew services list
-
-use: mongosh
-> to start using mongodb
-use mongo compass app for a gui of the data base
-or use: brew services stop mongodb-community@8.0
-
-next: 
-add the redirect URI to the JavaScript code and make sure it is in line with the allowed redirect UR as on Spotify
-change the redirect uri everywhere it shows up: so far: authtoken.py, and script.js
-
-
+General Notes:
+====================================
+Next time I have an issue, lets see what actual url request is getting sent over to spotify so i can zero in on the issue.
+make sure the url works for new users
 If i want another user to use my app, i have to approve them
+change all the ip address from 127.0.0.1:80 or 5000 to something else?
+finish complining todo list to here from all around code?
+add react?
 
-
-
-=====
-another idea:
-allow user to input what track position they want their playlist ("e.g. ABC New: position 2 (after intro track); can[t be 2])
-
-last security risk: placing code in browser's url
-
-#NEXT TODO:
-    #make sure the url works for new users
-    
- #how to submit url to spotify without it showing up in the user's browser for security reasons (e.g. the client_id and reroute page url... unless it will jsut be the url of my website when live?)
-    #how to grab the token from the url, or obtain the token all together withotu the token showing up in the user's page? or how to delete token from url before user sees, and reroute them to the same home page but unlocked.
-    #is the url containing the client id dangerous? does it show in the browser url?
-     #maybe the auth url reroute page will handle al the backen data and avoid the url holding the sensitive data, since it will essentially just render the url for spotify's page.
-    #/callback? How can I receieve the code and redirect user to home page?
-    
-    #also todo: a nice new homepage that users can see/visit without needing ot unlock and through need of loggign in.
+do a get my playlist button? whats this note mean?
